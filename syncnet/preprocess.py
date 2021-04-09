@@ -6,6 +6,7 @@ import torch
 import python_speech_features
 from moviepy.editor import *
 
+
 class Dataset:
     def __init__(self, data_path):
         self.audio_tensors = []
@@ -15,11 +16,16 @@ class Dataset:
                 if file.endswith(".mp4"):
                     self.preprocess_data(root + "/" + file)
 
+    """
+    Converts frame to black and white and crops to mouth region (lower half of face)
+    Also converts resulting output to 111 x 111 as described in syncnet paper
+    """
+
     @staticmethod
     def augment_frame(face_frame):
         blw_face_frame = cv2.cvtColor(face_frame, cv2.COLOR_RGB2GRAY)
-        mouth_region = blw_face_frame[blw_face_frame.shape[0]//2:blw_face_frame.shape[0], :]
-        return cv2.resize(mouth_region, (111,111))
+        mouth_region = blw_face_frame[blw_face_frame.shape[0] // 2:blw_face_frame.shape[0], :]
+        return cv2.resize(mouth_region, (111, 111))
 
     def preprocess_data(self, video_path):
         print(video_path)
@@ -46,11 +52,18 @@ class Dataset:
             os.system("rm " + _25_fps_vid_path)
             return
 
-        frames = np.split(np.array(frames), num_frames/5)
+        frames = np.split(np.array(frames), num_frames / 5)
 
         # convert sets of 5 into tensors
         for group_of_5_frames in frames:
-            visual_input_tensor = torch.from_numpy(group_of_5_frames.astype(float))
+            _3_d_blw_imgs = []
+            for blw_frame in group_of_5_frames:
+                _3_d_blw_imgs.append(np.array([blw_frame, blw_frame, blw_frame]))
+            images = np.stack(_3_d_blw_imgs, axis=3)
+            images = np.expand_dims(images, axis=0)
+            images = np.transpose(images, (0, 3, 4, 1, 2))
+
+            visual_input_tensor = torch.autograd.Variable(torch.from_numpy(images.astype(float)).float())
             self.frame_tensors.append(visual_input_tensor)
 
         # get audio
@@ -69,6 +82,8 @@ class Dataset:
         # remove 25 fps file
         os.system("rm " + audio_save_path)
         os.system("rm " + _25_fps_vid_path)
+
+    """Get audio and visual tensors"""
 
     def get_data(self):
         return self.frame_tensors, self.audio_tensors
