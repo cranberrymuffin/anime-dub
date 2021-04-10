@@ -62,6 +62,7 @@ class DataPipeline:
 
         # group frames into sets of 5
         frames_groups = np.split(frames, frames.shape[0] / 5)
+        # 5 x 111 x 111
         frame_groups = [np.dstack(group) for group in frames_groups]
         num_frame_groups = len(frame_groups)
         assert (frame_groups[0].shape == (111, 111, 5))
