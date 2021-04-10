@@ -1,6 +1,6 @@
 import argparse
-from preprocess import Dataset
-from syncnet import LipSyncEvalNet
+from preprocess import DataPipeline
+from syncnet import VisualModel, AudioModel
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--data_dir', required=True, help='Directory of anime videos.')
@@ -9,7 +9,8 @@ args = parser.parse_args()
 
 
 def train(frame_tensors, audio_tensors):
-    nn = LipSyncEvalNet()
+    visual_model = VisualModel()
+    audio_model = AudioModel()
 
     for frame_tensor in frame_tensors:
         nn.forward_lip(frame_tensor)
