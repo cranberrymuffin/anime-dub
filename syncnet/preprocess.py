@@ -11,8 +11,8 @@ input_duration_seconds = 0.2
 
 class DataPipeline:
     def __init__(self, data_path):
-        self.audio_tensors = []
-        self.frame_tensors = []
+        self.audio_inputs = []
+        self.visual_inputs = []
         for root, dirs, files in os.walk(data_path):
             for file in files:
                 if file.endswith(".mp4"):
@@ -38,6 +38,8 @@ class DataPipeline:
 
         frames, mfccs = self.trim_mfcc_and_visual(frames, mfcc)
         assert (len(frames) == len(mfccs))
+        self.visual_inputs.append(frames)
+        self.audio_inputs.append(mfccs)
 
     @staticmethod
     def trim_mfcc_and_visual(frames, mfcc):
@@ -110,7 +112,7 @@ class DataPipeline:
         return frames
 
     def get_data(self):
-        return self.frame_tensors, self.audio_tensors
+        return self.visual_inputs, self.audio_inputs
 
 
 if __name__ == "__main__":
