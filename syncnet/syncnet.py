@@ -1,10 +1,9 @@
-## From https://github.com/joonson/syncnet_python/blob/master/SyncNetModel.py ##
 import torch.nn as nn
 
 
 class LipSyncEvalNet(nn.Module):
     def __init__(self, num_layers_in_fc_layers=1024):
-        super(LipSyncEvalNet, self).__init__()
+        super(S, self).__init__()
 
         self.__nFeatures__ = 24
         self.__nChs__ = 32
@@ -72,13 +71,13 @@ class LipSyncEvalNet(nn.Module):
             nn.BatchNorm3d(256),
             nn.ReLU(inplace=True),
 
-            nn.Conv3d(256, 512, kernel_size=(1, 3, 3), padding=0),
-            nn.BatchNorm3d(512),
-            #nn.ReLU(inplace=True),
-            #nn.MaxPool3d(kernel_size=(1, 3, 3), stride=(1, 2, 2)),
+            nn.Conv3d(256, 256, kernel_size=(1, 3, 3), padding=(0, 1, 1)),
+            nn.BatchNorm3d(256),
+            nn.ReLU(inplace=True),
+            nn.MaxPool3d(kernel_size=(1, 3, 3), stride=(1, 2, 2)),
 
-            #nn.Conv3d(256, 512, kernel_size=(1, 6, 6), padding=0),
-            #nn.BatchNorm3d(512),
+            nn.Conv3d(256, 512, kernel_size=(1, 6, 6), padding=0),
+            nn.BatchNorm3d(512),
             nn.ReLU(inplace=True),
         )
 
