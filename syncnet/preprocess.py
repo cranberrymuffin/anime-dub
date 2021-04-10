@@ -128,13 +128,13 @@ class Dataset:
         for i in range(0, lastframe, batch_size):
             im_batch = [imtv[:, :, vframe:vframe + 5, :, :] for vframe in range(i, min(lastframe, i + batch_size))]
             im_in = torch.cat(im_batch, 0)
-            im_out = self.nn.forward_lip(im_in.cuda());
+            im_out = self.nn.forward_lip(im_in);
             im_feat.append(im_out.data.cpu())
 
             cc_batch = [cct[:, :, :, vframe * 4:vframe * 4 + 20] for vframe in
                         range(i, min(lastframe, i + batch_size))]
             cc_in = torch.cat(cc_batch, 0)
-            cc_out = self.nn.forward_aud(cc_in.cuda())
+            cc_out = self.nn.forward_aud(cc_in)
             cc_feat.append(cc_out.data.cpu())
 
 

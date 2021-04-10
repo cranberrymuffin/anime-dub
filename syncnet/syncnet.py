@@ -72,13 +72,13 @@ class LipSyncEvalNet(nn.Module):
             nn.BatchNorm3d(256),
             nn.ReLU(inplace=True),
 
-            nn.Conv3d(256, 256, kernel_size=(1, 3, 3), padding=(0, 1, 1)),
-            nn.BatchNorm3d(256),
-            nn.ReLU(inplace=True),
-            nn.MaxPool3d(kernel_size=(1, 3, 3), stride=(1, 2, 2)),
-
-            nn.Conv3d(256, 512, kernel_size=(1, 6, 6), padding=0),
+            nn.Conv3d(256, 512, kernel_size=(1, 3, 3), padding=0),
             nn.BatchNorm3d(512),
+            #nn.ReLU(inplace=True),
+            #nn.MaxPool3d(kernel_size=(1, 3, 3), stride=(1, 2, 2)),
+
+            #nn.Conv3d(256, 512, kernel_size=(1, 6, 6), padding=0),
+            #nn.BatchNorm3d(512),
             nn.ReLU(inplace=True),
         )
 
