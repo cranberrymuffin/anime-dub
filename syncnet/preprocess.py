@@ -82,7 +82,7 @@ class Dataset:
         while success:
             # convert frame to black and white and crop to mouth region (bottom half of face)
             frame = self.augment_frame(frame)
-            images.append(np.array([frame, frame, frame]))
+            images.append(cv2.cvtColor(frame, cv2.COLOR_GRAY2RGB))
             success, frame = video.read()
 
         im = np.stack(images, axis=3)
