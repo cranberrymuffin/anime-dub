@@ -41,24 +41,31 @@ class DataPipeline:
     def trim_mfcc_and_visual(self, frames, mfcc):
         # trim mfcc cols to be a multiple of 20
         num_cols = mfcc.shape[1]
+        assert(num_cols > 20)
         to_trim = num_cols % 20
-        mfcc = mfcc[:, :-to_trim]
-
+        if to_trim > 0:
+            mfcc = mfcc[:, :-to_trim]
         # group mfcc cols into sets of 20
-        mfcc_groups = np.hsplit(mfcc, 20)
+        mfcc_groups = np.hsplit(mfcc, mfcc.shape[1]/20)
         num_mfccs = len(mfcc_groups)
-
+        assert(mfcc_groups[0].shape == (13, 20))
         # trim frames to be a multiple of 5
         num_frames = frames.shape[0]
+        assert(num_frames > 5)
         to_trim = num_frames % 5
-        frames = frames[:-to_trim, :, :]
+        if to_trim > 0:
+            frames = frames[:-to_trim, :, :]
 
         # group frames into sets of 5
-        frame_groups = np.split(frames, 5)
+        frames_groups = np.split(frames, frames.shape[0]/5)
+        frame_groups = [np.dstack(group) for group in frames_groups]
         num_frame_groups = len(frame_groups)
+        assert(frame_groups[0].shape == (111, 111, 5))
 
         num_groups = min(num_mfccs, num_frame_groups)
-        return frame_groups[:num_groups], mfcc_groups[:num_groups]
+        to_return = frame_groups[:num_groups], mfcc_groups[:num_groups]
+        assert(len(to_return[0]) == len(to_return[1]))
+        return to_return
 
     """
     Converts a audio clip to MFCC map of N x 13 x 20
@@ -85,16 +92,18 @@ class DataPipeline:
 
     def format_input_visual(self, video_path):
         video = cv2.VideoCapture(video_path)
+        print(video.get(cv2.CAP_PROP_FPS))
         assert (video.get(cv2.CAP_PROP_FPS) == 25)
         success, frame = video.read()
         frames = []
         while success:
             blw_mouth = cv2.cvtColor(frame, cv2.COLOR_RGB2GRAY)[frame.shape[0] // 2:frame.shape[0], :]
-            cv2.resize(blw_mouth, (111, 111))
+            blw_mouth = cv2.resize(blw_mouth, (111, 111))
             frames.append(blw_mouth)
             success, frame = video.read()
         frames = np.array(frames)
         os.system("rm " + video_path)
+        assert(frames[0].shape == (111, 111))
         return frames
 
 
