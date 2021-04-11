@@ -1,13 +1,14 @@
 import tensorflow as tf
 from tensorflow.keras.layers import Conv2D, MaxPool2D, ReLU, ZeroPadding2D, BatchNormalization, Flatten, Dense
-import hyperparameters as hp
+
+from .hyperparameters import learning_rate
 
 
 class AudioModel(tf.keras.Model):
     def __init__(self):
         super(AudioModel, self).__init__()
 
-        self.optimizer = tf.keras.optimizers.Adam(learning_rate=hp.learning_rate)
+        self.optimizer = tf.keras.optimizers.Adam(learning_rate=learning_rate)
         self.architecture = [
             Conv2D(64, kernel_size=(3, 3), strides=(1, 1)),
             ZeroPadding2D(padding=(1, 1)),

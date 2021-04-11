@@ -4,8 +4,8 @@ import python_speech_features
 import numpy as np
 import os
 import tensorflow as tf
-from syncnet.models.visual_model import VisualModel
-from syncnet.models.audio_model import AudioModel
+from models.visual_model import VisualModel
+from models.audio_model import AudioModel
 # 0.2 seconds
 input_duration_milliseconds = 200
 input_duration_seconds = 0.2
