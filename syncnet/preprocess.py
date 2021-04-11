@@ -4,10 +4,14 @@ import python_speech_features
 import numpy as np
 import os
 import tensorflow as tf
-
+from syncnet.models.visual_model import VisualModel
+from syncnet.models.audio_model import AudioModel
 # 0.2 seconds
 input_duration_milliseconds = 200
 input_duration_seconds = 0.2
+
+visual_model = VisualModel()
+audio_model = AudioModel()
 
 class DataPipeline:
     def __init__(self, data_path):
@@ -41,6 +45,11 @@ class DataPipeline:
 
         frames, mfccs = self.convert_to_input_tensors(frames, mfccs)
 
+        # comment - test code for nn tensor shapes
+        for frame, mfcc in zip(frames, mfccs):
+            visual_model.call(frame)
+        #    audio_model.call(mfcc)
+
         self.visual_inputs.append(frames)
         self.audio_inputs.append(mfccs)
 
@@ -67,11 +76,11 @@ class DataPipeline:
 
         # group frames into sets of 5
         frames_groups = np.split(frames, frames.shape[0] / 5)
-        # 5 x 120 x 120
+        # 5 x 224 x 224
         frame_groups = [np.expand_dims(group, axis=-1) for group in frames_groups]
         num_frame_groups = len(frame_groups)
-        # for 3D convolution, 120 x 120 image, depth of 5, 1 color channel
-        assert (frame_groups[0].shape == (5, 120, 120, 1))
+        # for 3D convolution, 224 x 224 image, depth of 5, 1 color channel
+        assert (frame_groups[0].shape == (5, 224, 224, 1))
 
         num_groups = min(num_mfccs, num_frame_groups)
         to_return = frame_groups[:num_groups], mfcc_groups[:num_groups]
@@ -110,7 +119,7 @@ class DataPipeline:
     Converts a video clip to sets of 5 frames (at the 25Hz frame rate)
     
     Each frame has a black and white mouth region
-    Each frame has the dimension 120×120
+    Each frame has the dimension 224×224
     
     Gives 5 frames for every 0.2 second    
     """
@@ -123,12 +132,12 @@ class DataPipeline:
         frames = []
         while success:
             blw_mouth = cv2.cvtColor(frame, cv2.COLOR_RGB2GRAY)[frame.shape[0] // 2:frame.shape[0], :]
-            blw_mouth = cv2.resize(blw_mouth, (120, 120))
+            blw_mouth = cv2.resize(blw_mouth, (224, 224))
             frames.append(blw_mouth)
             success, frame = video.read()
         frames = np.array(frames)
         os.system("rm " + video_path)
-        assert (frames[0].shape == (120, 120))
+        assert (frames[0].shape == (224, 224))
         return frames
 
     def get_data(self):

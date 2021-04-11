@@ -1,5 +1,5 @@
 import tensorflow as tf
-from tensorflow.keras.layers import Conv3D, MaxPool3D, Flatten, Dense, BatchNormalization
+from tensorflow.keras.layers import Conv3D, ReLU, MaxPool3D, Dense, BatchNormalization, Flatten, ZeroPadding3D
 
 import hyperparameters as hp
 
@@ -10,40 +10,45 @@ class VisualModel(tf.keras.Model):
 
         self.optimizer = tf.keras.optimizers.Adam(learning_rate=hp.learning_rate)
         self.architecture = [
-            # Conv1 Lip
-            Conv3D(96, kernel_size=(5, 3, 3), strides=(1, 2, 2), input_shape=(1, 5, 120, 120, 1),
-                   name="conv1_lip", data_format='channels_last', activation="relu"),
-            BatchNormalization(name="batch_norm1_lip"),
-            MaxPool3D(pool_size=(1, 3, 3), strides=(1, 2, 2), name="pool1_lip"),
+            Conv3D(96, kernel_size=(5, 7, 7), strides=(1, 2, 2), data_format="channels_last"),
+            ZeroPadding3D(padding=0),
+            BatchNormalization(),
+            ReLU(),
+            MaxPool3D(pool_size=(1, 3, 3), strides=(1, 2, 2)),
 
-            # Conv2 Lip
-            Conv3D(256, kernel_size=(1, 3, 3), strides=(1, 2, 2), padding="same", name="conv2_lip",
-                   data_format='channels_last', activation="relu"),
-            BatchNormalization(name="batch_norm2_lip"),
-            MaxPool3D(pool_size=(1, 3, 3), strides=(1, 2, 2), padding="same"),
+            Conv3D(256, kernel_size=(1, 5, 5), strides=(1, 2, 2), data_format="channels_last"),
+            ZeroPadding3D(padding=(0, 1, 1)),
+            BatchNormalization(),
+            ReLU(),
+            MaxPool3D(pool_size=(1, 3, 3), strides=(1, 2, 2)),
+            ZeroPadding3D(padding=(0, 1, 1)),
 
-            # Conv3 Lip
-            Conv3D(512, kernel_size=(1, 3, 3), padding="same", name="conv3_lip", data_format='channels_last',
-                   activation="relu"),
-            BatchNormalization(name="batch_norm3_lip"),
+            Conv3D(256, kernel_size=(1, 3, 3), data_format="channels_last"),
+            ZeroPadding3D(padding=(0, 1, 1)),
+            BatchNormalization(),
+            ReLU(),
 
-            # Conv4 Lip
-            Conv3D(512, kernel_size=(1, 3, 3), padding="same", name="conv4_lip", data_format='channels_last',
-                   activation="relu"),
-            BatchNormalization(name="batch_norm4_lip"),
+            Conv3D(256, kernel_size=(1, 3, 3), data_format="channels_last"),
+            ZeroPadding3D(padding=(0, 1, 1)),
+            BatchNormalization(),
+            ReLU(),
 
-            # Conv5 Lip
-            Conv3D(512, kernel_size=(1, 3, 3), padding="same", name="conv5_lip", data_format='channels_last',
-                   activation="relu"),
-            BatchNormalization(name="batch_norm5_lip"),
-            MaxPool3D(pool_size=(1, 3, 3), strides=(1, 2, 2), name="pool5_lip"),
+            Conv3D(256, kernel_size=(1, 3, 3), data_format="channels_last"),
+            ZeroPadding3D(padding=(0, 1, 1)),
+            BatchNormalization(),
+            ReLU(),
+            MaxPool3D(pool_size=(1, 3, 3), strides=(1, 2, 2)),
 
-            Flatten(name="flatten_lip"),
+            Conv3D(512, kernel_size=(1, 6, 6), data_format="channels_last"),
+            ZeroPadding3D(padding=0),
+            BatchNormalization(),
+            ReLU(),
 
-            Dense(4096, name='fc7_lip', activation="relu"),
-            BatchNormalization(name='bn7_lip'),
-
-            Dense(256, name='fc7_lip', activation='relu')
+            Flatten(),
+            Dense(512),
+            BatchNormalization(),
+            ReLU(),
+            Dense(1024),
         ]
 
     """ Passes input video through the network. """
