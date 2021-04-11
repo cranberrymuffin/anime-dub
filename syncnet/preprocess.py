@@ -4,14 +4,10 @@ import python_speech_features
 import numpy as np
 import os
 import tensorflow as tf
-from syncnet import VisualModel, AudioModel
 
 # 0.2 seconds
 input_duration_milliseconds = 200
 input_duration_seconds = 0.2
-
-visual_model = VisualModel()
-audio_model = AudioModel()
 
 class DataPipeline:
     def __init__(self, data_path):
@@ -44,11 +40,6 @@ class DataPipeline:
         assert (len(frames) == len(mfccs))
 
         frames, mfccs = self.convert_to_input_tensors(frames, mfccs)
-
-        # comment - test code for nn tensor shapes
-        #for frame, mfcc in zip(frames, mfccs):
-        #    visual_model.call(frame)
-        #    audio_model.call(mfcc)
 
         self.visual_inputs.append(frames)
         self.audio_inputs.append(mfccs)
