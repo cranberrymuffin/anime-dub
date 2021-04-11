@@ -1,6 +1,5 @@
 import tensorflow as tf
-from tensorflow.keras.layers import Conv2D, MaxPool2D, Flatten, Dense, BatchNormalization
-
+from tensorflow.keras.layers import Conv2D, MaxPool2D, ReLU, ZeroPadding2D, BatchNormalization, Flatten, Dense
 import hyperparameters as hp
 
 
@@ -10,37 +9,44 @@ class AudioModel(tf.keras.Model):
 
         self.optimizer = tf.keras.optimizers.Adam(learning_rate=hp.learning_rate)
         self.architecture = [
-            # conv1
-            Conv2D(96, kernel_size=(3, 3), strides=(1, 1), padding="same", name='conv1_audio',
-                   input_shape=(1, 13, 20, 1), activation="relu"),
-            BatchNormalization(name='bn1_audio'),
+            Conv2D(64, kernel_size=(3, 3), strides=(1, 1)),
+            ZeroPadding2D(padding=(1, 1)),
+            BatchNormalization(),
+            ReLU(),
+            MaxPool2D(pool_size=(1, 1), strides=(1, 1)),
 
-            # conv2
-            Conv2D(256, kernel_size=(3, 3), strides=(1, 1), padding="same", name='conv2_audio', activation="relu"),
-            BatchNormalization(name='bn2_audio'),
-            MaxPool2D(pool_size=(1, 3), strides=(1, 2), name='pool2_audio'),
+            Conv2D(192, kernel_size=(3, 3), strides=(1, 1)),
+            ZeroPadding2D(padding=(1, 1)),
+            BatchNormalization(),
+            ReLU(),
+            MaxPool2D(pool_size=(3, 3), strides=(1, 2)),
 
-            # conv3
-            Conv2D(512, kernel_size=(3, 3), padding="same", name='conv3_audio', activation="relu"),
-            BatchNormalization(name='bn3_audio'),
+            Conv2D(384, kernel_size=(3, 3)),
+            ZeroPadding2D(padding=(1, 1)),
+            BatchNormalization(),
+            ReLU(),
 
-            # conv4
-            Conv2D(512, kernel_size=(3, 3), padding="same", name='conv4_audio', activation="relu"),
-            BatchNormalization(name='bn4_audio'),
+            Conv2D(256, kernel_size=(3, 3)),
+            ZeroPadding2D(padding=(1, 1)),
+            BatchNormalization(),
+            ReLU(),
 
-            # conv6
-            Conv2D(512, kernel_size=(5, 4), name='conv6_audio', activation="relu"),
-            BatchNormalization(name='bn6_audio'),
-            MaxPool2D(pool_size=(1, 3), strides=(1, 2), name='pool6_audio'),
+            Conv2D(256, kernel_size=(3, 3)),
+            ZeroPadding2D(padding=(1, 1)),
+            BatchNormalization(),
+            ReLU(),
+            MaxPool2D(pool_size=(3, 3), strides=(2, 2)),
 
-            Flatten(name='flatten_audio'),
+            Conv2D(512, kernel_size=(5, 4)),
+            ZeroPadding2D(padding=(0, 0)),
+            BatchNormalization(),
+            ReLU(),
 
-            # fc7
-            Dense(4096, name='fc7_audio', activation="relu"),
-            BatchNormalization(name='bn7_audio'),
-
-            # fc8
-            Dense(256, name='fc8_audio', activation='relu')
+            Flatten(),
+            Dense(512),
+            BatchNormalization(),
+            ReLU(),
+            Dense(1024),
         ]
 
     """ Passes input audio through the network. """
