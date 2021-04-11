@@ -17,10 +17,6 @@ def train(visual_tensors, audio_tensors):
             out_a, out_A = audio_model.call(audio_tensor.cuda())
             out_v, out_V = visual_model.call(visual_tensor.cuda())
 
-            visual_model.forward_lip(visual_tensor)
-            audio_model.forward_aud(audio_tensor)
-
-
 
 if __name__ == "__main__":
     frame_tensors, audio_tensors = DataPipeline("/Users/aparna/Downloads/converted/").get_data()
