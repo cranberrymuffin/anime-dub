@@ -19,6 +19,6 @@ def train(visual_tensors, audio_tensors):
 
 
 if __name__ == "__main__":
-    frame_tensors, audio_tensors = DataPipeline("/Users/aparna/Downloads/converted/").get_data()
+    frame_tensors, audio_tensors = DataPipeline("data/converted/").get_data()
     # if args.mode == "train":
     train(frame_tensors, audio_tensors)
