@@ -46,9 +46,9 @@ class DataPipeline:
         frames, mfccs = self.convert_to_input_tensors(frames, mfccs)
 
         # comment - test code for nn tensor shapes
-        for frame, mfcc in zip(frames, mfccs):
-            visual_model.forward_pass(frame)
-            audio_model.forward_pass(mfcc)
+        #for frame, mfcc in zip(frames, mfccs):
+        #    visual_model.call(frame)
+        #    audio_model.call(mfcc)
 
         self.visual_inputs.append(frames)
         self.audio_inputs.append(mfccs)
@@ -63,8 +63,10 @@ class DataPipeline:
             mfcc = mfcc[:, :-to_trim]
         # group mfcc cols into sets of 20
         mfcc_groups = np.hsplit(mfcc, mfcc.shape[1] / 20)
+        mfcc_groups = [np.expand_dims(mfcc, axis=-1) for mfcc in mfcc_groups]
+
         num_mfccs = len(mfcc_groups)
-        assert (mfcc_groups[0].shape == (13, 20))
+        assert (mfcc_groups[0].shape == (13, 20, 1))
         # trim frames to be a multiple of 5
         num_frames = frames.shape[0]
         assert (num_frames > 5)
@@ -75,10 +77,10 @@ class DataPipeline:
         # group frames into sets of 5
         frames_groups = np.split(frames, frames.shape[0] / 5)
         # 5 x 120 x 120
-        frame_groups = [np.expand_dims(np.dstack(group), axis=-1) for group in frames_groups]
+        frame_groups = [np.expand_dims(group, axis=-1) for group in frames_groups]
         num_frame_groups = len(frame_groups)
         # for 3D convolution, 120 x 120 image, depth of 5, 1 color channel
-        assert (frame_groups[0].shape == (120, 120, 5, 1))
+        assert (frame_groups[0].shape == (5, 120, 120, 1))
 
         num_groups = min(num_mfccs, num_frame_groups)
         to_return = frame_groups[:num_groups], mfcc_groups[:num_groups]
@@ -91,9 +93,9 @@ class DataPipeline:
         visual_tensors = []
         audio_tensors = []
         for visual_input in visual_inputs:
-            visual_tensors.append(tf.convert_to_tensor(visual_input))
+            visual_tensors.append(tf.convert_to_tensor(np.expand_dims(visual_input, axis=0), dtype='float32'))
         for audio_input in audio_inputs:
-            audio_tensors.append(tf.convert_to_tensor(np.expand_dims(audio_input, axis=-1)))
+            audio_tensors.append(tf.convert_to_tensor(np.expand_dims(audio_input, axis=0), dtype='float32'))
         assert (len(visual_tensors) == len(audio_tensors))
 
         return visual_tensors, audio_tensors
