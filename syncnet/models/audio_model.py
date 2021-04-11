@@ -1,6 +1,6 @@
 import tensorflow as tf
 from tensorflow.keras.layers import Conv2D, MaxPool2D, ReLU, ZeroPadding2D, BatchNormalization, Flatten, Dense
-import hyperparameters as hp
+from syncnet import hyperparameters as hp
 
 
 class AudioModel(tf.keras.Model):
