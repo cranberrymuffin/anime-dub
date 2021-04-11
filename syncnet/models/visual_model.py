@@ -1,7 +1,7 @@
 import tensorflow as tf
 from tensorflow.keras.layers import Conv3D, ReLU, MaxPool3D, Dense, BatchNormalization, Flatten, ZeroPadding3D
 
-from syncnet import hyperparameters as hp
+import hyperparameters as hp
 
 
 class VisualModel(tf.keras.Model):
