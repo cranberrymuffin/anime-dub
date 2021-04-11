@@ -145,4 +145,4 @@ class DataPipeline:
 
 
 if __name__ == "__main__":
-    DataPipeline("/data/converted/").get_data()
+    DataPipeline("data/converted/").get_data()
