@@ -2,10 +2,6 @@ import tensorflow as tf
 from tensorflow.keras.layers import Conv2D, Conv3D, MaxPool2D, MaxPool3D, Flatten, Dense, BatchNormalization, ReLU
 import hyperparameters as hp
 
-
-# references: https://medium.com/analytics-vidhya/syncnet-model-with-vidtimit-dataset-dd9de2cb2fb5
-#             https://github.com/joonson/syncnet_python/blob/master/SyncNetModel.py
-
 class VisualModel(tf.keras.Model):
     def __init__(self):
         super(VisualModel, self).__init__()
@@ -42,7 +38,7 @@ class VisualModel(tf.keras.Model):
             Dense(4096, name='fc7_lip', activation="relu"),
             BatchNormalization(name='bn7_lip'),
 
-            Dense(256, name='fc7_lip')
+            Dense(256, name='fc7_lip',  activation='relu')
         ]
 
     """ Passes input video through the network. """
@@ -89,7 +85,7 @@ class AudioModel(tf.keras.Model):
             BatchNormalization(name='bn7_audio'),
 
             # fc8
-            Dense(256, name='fc8_audio')
+            Dense(256, name='fc8_audio', activation='relu')
         ]
 
     """ Passes input audio through the network. """
