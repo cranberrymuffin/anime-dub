@@ -45,25 +45,25 @@ def train(visual_tensors, audio_tensors, is_synced_labels):
     constrative_loss(distances, is_synced_labels, max(distances))
 
 if __name__ == "__main__":
-    # try:
-    #     frames_dataset = tf.data.experimental.load("saved_data/frames",
-    #         tf.TensorSpec(shape=(1, 1, 9, 5, 224, 224, 1), dtype=tf.float32, name=None))
-    #     audio_dataset = tf.data.experimental.load("saved_data/audio",
-    #         tf.TensorSpec(shape=(1, 1, 9, 13, 20, 1), dtype=tf.float32, name=None))
+    try:
+        frames_dataset = tf.data.experimental.load("saved_data/frames",
+            tf.TensorSpec(shape=(1, 1, 9, 5, 224, 224, 1), dtype=tf.float32, name=None))
+        audio_dataset = tf.data.experimental.load("saved_data/audio",
+            tf.TensorSpec(shape=(1, 1, 9, 13, 20, 1), dtype=tf.float32, name=None))
 
-    #     print("Retrieving saved dataset...")
-    # except:
-    #     print("Could not find saved dataset, generating and saving new dataset...")
+        print("Retrieving saved dataset...")
+    except:
+        print("Could not find saved dataset, generating and saving new dataset...")
 
-    frames, audio = DataPipeline("data/converted/").get_data()
+        frames, audio = DataPipeline("data/converted/").get_data()
 
-    print("pre-processed the data")
+        print("pre-processed the data")
 
-        # frames_dataset = tf.data.Dataset.from_tensors(frames)
-        # audio_dataset = tf.data.Dataset.from_tensors(audio)
+        frames_dataset = tf.data.Dataset.from_tensors(frames)
+        audio_dataset = tf.data.Dataset.from_tensors(audio)
 
-        # tf.data.experimental.save(frames_dataset, "saved_data/frames")
-        # tf.data.experimental.save(audio_dataset, "saved_data/audio")
+        tf.data.experimental.save(frames_dataset, "saved_data/frames")
+        tf.data.experimental.save(audio_dataset, "saved_data/audio")
 
     # To check the contents of the dataset, like this
     # for data in frames_dataset:
