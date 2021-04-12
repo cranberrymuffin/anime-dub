@@ -140,7 +140,7 @@ class DataPipeline:
         return frames
 
     def get_data(self):
-        # Returns list with one item in it - the large tensor with the data for visual/audio
+        # Returns list with tensors
         return self.visual_inputs, self.audio_inputs
 
 
