@@ -43,7 +43,7 @@ class DataPipeline:
         frames, mfccs = self.trim_mfcc_and_visual(frames, mfcc)
         assert (len(frames) == len(mfccs))
 
-        frames, mfccs = self.convert_to_input_tensors(frames, mfccs)
+        #frames, mfccs = self.convert_to_input_tensors(frames, mfccs)
 
         # comment - test code for nn tensor shapes
         for frame, mfcc in zip(frames, mfccs):
