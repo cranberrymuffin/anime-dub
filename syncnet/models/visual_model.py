@@ -1,14 +1,14 @@
 import tensorflow as tf
 from tensorflow.keras.layers import Conv3D, ReLU, MaxPool3D, Dense, BatchNormalization, Flatten, ZeroPadding3D
 
-import hyperparameters as hp
+from .hyperparameters import learning_rate
 
 
 class VisualModel(tf.keras.Model):
     def __init__(self):
         super(VisualModel, self).__init__()
 
-        self.optimizer = tf.keras.optimizers.Adam(learning_rate=hp.learning_rate)
+        self.optimizer = tf.keras.optimizers.Adam(learning_rate=learning_rate)
         self.architecture = [
             Conv3D(96, kernel_size=(5, 7, 7), strides=(1, 2, 2), data_format="channels_last"),
             ZeroPadding3D(padding=0),

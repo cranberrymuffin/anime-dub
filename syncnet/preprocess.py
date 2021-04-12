@@ -4,8 +4,8 @@ import python_speech_features
 import numpy as np
 import os
 import tensorflow as tf
-from syncnet.models.visual_model import VisualModel
-from syncnet.models.audio_model import AudioModel
+from models.visual_model import VisualModel
+from models.audio_model import AudioModel
 # 0.2 seconds
 input_duration_milliseconds = 200
 input_duration_seconds = 0.2
@@ -48,6 +48,7 @@ class DataPipeline:
         # comment - test code for nn tensor shapes
         for frame, mfcc in zip(frames, mfccs):
             visual_model.call(frame)
+
         #    audio_model.call(mfcc)
 
         self.visual_inputs.append(frames)
@@ -89,14 +90,12 @@ class DataPipeline:
 
     @staticmethod
     def convert_to_input_tensors(visual_inputs, audio_inputs):
+  
+        # Creates a tensor of shape (1,1,9,5,224,224,1)
+        visual_tensors = tf.convert_to_tensor(np.expand_dims(visual_inputs, axis=0), dtype='float32')
 
-        visual_tensors = []
-        audio_tensors = []
-        for visual_input in visual_inputs:
-            visual_tensors.append(tf.convert_to_tensor(np.expand_dims(visual_input, axis=0), dtype='float32'))
-        for audio_input in audio_inputs:
-            audio_tensors.append(tf.convert_to_tensor(np.expand_dims(audio_input, axis=0), dtype='float32'))
-        assert (len(visual_tensors) == len(audio_tensors))
+        # Creates a tensor of shape (1,1,9,13,20,1)
+        audio_tensors = tf.convert_to_tensor(np.expand_dims(audio_inputs, axis=0), dtype='float32')
 
         return visual_tensors, audio_tensors
 
@@ -141,8 +140,9 @@ class DataPipeline:
         return frames
 
     def get_data(self):
+        # Returns list with one item in it - the large tensor with the data for visual/audio
         return self.visual_inputs, self.audio_inputs
 
 
 if __name__ == "__main__":
-    DataPipeline("/Users/aparna/Downloads/converted/").get_data()
+    DataPipeline("data/converted/").get_data()
