@@ -46,8 +46,8 @@ class DataPipeline:
         #frames, mfccs = self.convert_to_input_tensors(frames, mfccs)
 
         # comment - test code for nn tensor shapes
-        for frame, mfcc in zip(frames, mfccs):
-            visual_model.call(frame)
+        # for frame, mfcc in zip(frames, mfccs):
+        #     visual_model.call(frame)
 
         #    audio_model.call(mfcc)
 
