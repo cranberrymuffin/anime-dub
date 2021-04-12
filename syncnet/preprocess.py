@@ -17,9 +17,8 @@ class DataPipeline:
     def __init__(self, data_path):
         self.audio_inputs = []
         self.visual_inputs = []
-        data_paths = list(os.walk(data_path))
-        for root, dirs, files in data_paths[0:2]:
-            for file in files[0:2]:
+        for root, dirs, files in os.walk(data_path):
+            for file in files:
                 if file.endswith(".mp4"):
                     self.format_video(root + "/" + file)
 
@@ -47,8 +46,8 @@ class DataPipeline:
         frames, mfccs = self.convert_to_input_tensors(frames, mfccs)
 
         # comment - test code for nn tensor shapes
-        # for frame, mfcc in zip(frames, mfccs):
-        #     visual_model.call(frame)
+        for frame, mfcc in zip(frames, mfccs):
+            visual_model.call(frame)
 
         #    audio_model.call(mfcc)
 
