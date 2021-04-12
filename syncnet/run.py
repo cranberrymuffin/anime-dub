@@ -2,6 +2,7 @@ from preprocess import DataPipeline
 from syncnet.models.visual_model import VisualModel
 from syncnet.models.audio_model import AudioModel
 import tensorflow as tf
+import numpy as np
 
 # parser = argparse.ArgumentParser()
 # parser.add_argument('--data_dir', required=True, help='Directory of anime videos.')
@@ -17,31 +18,31 @@ def euclidean_distance(audio_output, visual_output):
     return tf.norm(tf.subtract(audio_output, visual_output))
 
 # ??? what is margin
-# ??? what is y_ns
-# visual outputs is the tensor output of visual nn
-# audio outputs is the tensor output of audio nn
-# ??? how many is N (is it for just a single video or the whole training set)
-def constrative_loss(audio_outputs, visual_outputs, y_ns, margin):
-    assert(len(audio_outputs) == len(visual_outputs))
-    N = len(audio_outputs)
-    E = 0.0
+# is_synced_labels - binary similarity metric, array of labels stating whether the audio/visual output pair at index i
+#                    is synced or not.
+def constrative_loss(audio_to_visual_output_distances, is_synced_labels, margin):
+    N = len(audio_to_visual_output_distances) # N is batch size
+    loss = 0.0
 
     for i in range(N):
-        audio_output = audio_outputs[i]
-        visual_output = visual_outputs[i]
-        d_n = euclidean_distance(audio_output, visual_output)
-        y_n = y_ns[i]
-        E = E + ((y_n * pow(d_n, 2)) + ((1-y_n) * pow(max(margin - d_n, 0), 2)))
+        distance = audio_to_visual_output_distances[i]
+        is_synced = is_synced_labels[i]
+        loss = loss + ((is_synced * pow(distance, 2)) + ((1-is_synced) * pow(max(margin - distance, 0), 2)))
 
-    return E
+    return loss
 
-def train(visual_tensors, audio_tensors):
+def train(visual_tensors, audio_tensors, is_synced_labels):
+    assert(len(visual_tensors) == len(audio_tensors))
+
+    distances = np.empty(visual_tensors)
 
     for visual_tensors_1_video, audio_tensors_1_video in zip(visual_tensors, audio_tensors):
-        for visual_tensor, audio_tensor in zip(visual_tensors_1_video, audio_tensors_1_video):
-            out_a, out_A = audio_model.call(audio_tensor.cuda())
-            out_v, out_V = visual_model.call(visual_tensor.cuda())
+        for idx, visual_tensor, audio_tensor in enumerate(zip(visual_tensors_1_video, audio_tensors_1_video)):
+            audio_output = audio_model.call(audio_tensor.cuda())
+            visual_output = visual_model.call(visual_tensor.cuda())
+            distances[idx] = euclidean_distance(audio_output, visual_output)
 
+    constrative_loss(distances, is_synced_labels, max(distances))
 
 if __name__ == "__main__":
     try:
