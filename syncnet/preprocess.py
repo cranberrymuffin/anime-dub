@@ -5,10 +5,6 @@ import numpy as np
 import os
 import subprocess
 
-# 0.2 seconds
-input_duration_milliseconds = 200
-input_duration_seconds = 0.2
-
 
 class DataPipeline:
     def __init__(self, data_path):
@@ -31,21 +27,18 @@ class DataPipeline:
     """
 
     def format_video(self, video_path):
-        tmp_video_path, tmp_audio_path = self.get_and_create_tmp_video_audio_file_names(video_path)
+        tmp_video_path, tmp_audio_path = self.get_and_create_tmp_video_audio_files(video_path)
         try:
             frames, mfccs = self.trim_mfcc_and_visual(
                 self.format_input_audio(tmp_audio_path),
                 self.format_input_visual(tmp_video_path)
             )
 
-            self.visual_inputs.append(frames)
-            self.audio_inputs.append(mfccs)
+            self.visual_inputs.extend(frames)
+            self.audio_inputs.extend(mfccs)
         finally:
             self.delete_file(tmp_video_path)
             self.delete_file(tmp_audio_path)
-            print("Deleted temporary files: ")
-            print("1) " + tmp_video_path)
-            print("2) " + tmp_audio_path)
 
     @staticmethod
     def group_mfccs(mfcc):
@@ -113,6 +106,7 @@ class DataPipeline:
     13 MFCC features representing powers at different frequency bins.
     Sampled at rate of 100Hz, gives 20 time steps for a 0.2-second input signal.
     """
+
     def format_input_audio(self, wav_file):
         wav, sample_rate = librosa.load(wav_file, sr=100)
         assert (sample_rate == 100)
@@ -128,6 +122,7 @@ class DataPipeline:
     
     Gives 5 frames for every 0.2 second    
     """
+
     def format_input_visual(self, video_path):
         video = cv2.VideoCapture(video_path)
 
@@ -151,7 +146,7 @@ class DataPipeline:
         # Returns list with tensors
         return self.visual_inputs, self.audio_inputs
 
-    def get_and_create_tmp_video_audio_file_names(self, video_path):
+    def get_and_create_tmp_video_audio_files(self, video_path):
         _, video_name = os.path.split(video_path)
         video_name = os.path.splitext(video_name)[0]
 
@@ -174,16 +169,8 @@ class DataPipeline:
         video_generation_process = subprocess.Popen(video_generation_cmd + silence_suffix, shell=True)
         video_generation_process.wait()
 
-        print("Created temporary files: ")
-        print("1) " + tmp_video_path)
-        print("2) " + tmp_audio_path)
-
     @staticmethod
     def delete_file(path_to_delete):
         rm_cmd = "rm " + path_to_delete
         rm_process = subprocess.Popen(rm_cmd, shell=True)
         rm_process.wait()
-
-
-if __name__ == "__main__":
-    DataPipeline("/Users/aparna/Downloads/converted/").get_data()

@@ -3,6 +3,7 @@ from models.visual_model import VisualModel
 from models.audio_model import AudioModel
 import tensorflow as tf
 import numpy as np
+from time import process_time
 
 # parser = argparse.ArgumentParser()
 # parser.add_argument('--data_dir', required=True, help='Directory of anime videos.')
@@ -12,27 +13,30 @@ import numpy as np
 visual_model = VisualModel()
 audio_model = AudioModel()
 
+
 # euclidean distance between audio/visual output pairs
 # they should be 0 given training data has perfect synchronicity
 def euclidean_distance(audio_output, visual_output):
     return tf.norm(tf.subtract(audio_output, visual_output))
 
+
 # ??? what is margin
 # is_synced_labels - binary similarity metric, array of labels stating whether the audio/visual output pair at index i
 #                    is synced or not.
-def constrative_loss(audio_to_visual_output_distances, is_synced_labels, margin):
-    N = len(audio_to_visual_output_distances) # N is batch size
+def contrastive_loss(audio_to_visual_output_distances, is_synced_labels, margin):
+    N = len(audio_to_visual_output_distances)  # N is batch size
     loss = 0.0
 
     for i in range(N):
         distance = audio_to_visual_output_distances[i]
         is_synced = is_synced_labels[i]
-        loss = loss + ((is_synced * pow(distance, 2)) + ((1-is_synced) * pow(max(margin - distance, 0), 2)))
+        loss = loss + ((is_synced * pow(distance, 2)) + ((1 - is_synced) * pow(max(margin - distance, 0), 2)))
 
     return loss
 
+
 def train(visual_tensors, audio_tensors, is_synced_labels):
-    assert(len(visual_tensors) == len(audio_tensors))
+    assert (len(visual_tensors) == len(audio_tensors))
 
     distances = np.empty(visual_tensors)
 
@@ -42,47 +46,39 @@ def train(visual_tensors, audio_tensors, is_synced_labels):
             visual_output = visual_model.call(visual_tensor.cuda())
             distances[idx] = euclidean_distance(audio_output, visual_output)
 
-    constrative_loss(distances, is_synced_labels, max(distances))
+    contrastive_loss(distances, is_synced_labels, max(distances))
+
 
 if __name__ == "__main__":
+
     try:
-        frames_dataset = tf.data.experimental.load("saved_data/frames",
-            tf.TensorSpec(shape=(1, 1, 9, 5, 224, 224, 1), dtype=tf.float32, name=None))
-        audio_dataset = tf.data.experimental.load("saved_data/audio",
-            tf.TensorSpec(shape=(1, 1, 9, 13, 20, 1), dtype=tf.float32, name=None))
+        print("Retrieving saved Data...")
+        start = process_time()
+        visual_data = np.load("converted_data/frames.npy", allow_pickle=True)
+        audio_data = np.load("converted_data/audio.npy", allow_pickle=True)
+        end = process_time()
+        print("Data retrieval completed in " + str(end - start) + " seconds!")
 
-        # For loading numpy arrays
-        # np.load("saved_data_np/frames")
-        # np.load("saved_data_np/audio")
-
-        print("Retrieving saved dataset...")
     except:
         print("Could not find saved dataset, generating and saving new dataset...")
 
-        frames, audio = DataPipeline("data/converted/").get_data()
+        print("Preprocessing Raw Video Data...")
+        start = process_time()
+        visual_data, audio_data = DataPipeline("/Users/aparna/Downloads/converted/").get_data()
 
-        print("pre-processed the data")
+        visual_data = np.array(visual_data)
+        audio_data = np.array(audio_data)
 
-        frames = np.array(frames)
-        audio = np.array(audio)
-
-        print("shape of frames: ", frames.shape)
-        print("shape of audio: ", audio.shape)
+        end = process_time()
+        print("Preprocessing completed in " + str(end - start) + " seconds!")
 
         # For saving as numpy arrays
-        np.save("saved_data_np/frames", frames)
-        np.save("saved_data_np/audio", audio)
+        np.save("converted_data/frames", visual_data, allow_pickle=True)
+        np.save("converted_data/audio", audio_data, allow_pickle=True)
 
-        print("saved data")
+        print("Saved data!")
 
-        # frames_dataset = tf.data.Dataset.from_tensors(frames)
-        # audio_dataset = tf.data.Dataset.from_tensors(audio)
-
-        # tf.data.experimental.save(frames_dataset, "saved_data/frames")
-        # tf.data.experimental.save(audio_dataset, "saved_data/audio")
-
-    # To check the contents of the dataset, like this
-    # for data in frames_dataset:
-    #     print(data)
-
-    # train(frame_tensors, audio_tensors)
+    assert (visual_data.shape[0] == audio_data.shape[0])
+    print("Number of Data Points: ", visual_data.shape[0])
+    print("Shape of Visual Data: ", visual_data.shape)
+    print("Shape of Audio Data: ", audio_data.shape)
