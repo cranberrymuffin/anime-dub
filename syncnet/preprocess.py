@@ -23,7 +23,11 @@ class DataPipeline:
         #             print(f"Preprocessing video/audio pair {i}/{len(files)}...")
         #             self.format_video(root + "/" + file)
 
-        self.format_video("data/converted/5917834433143869120/00033.mp4")
+        for root, dirs, files in os.walk("data/converted/5917834433143869120"):
+            for i,file in enumerate(files):
+                if file.endswith(".mp4"):
+                    print(f"Preprocessing video/audio pair {i}/{len(files)}...")
+                    self.format_video(root + "/" + file)
 
     """
     * The network ingests 0.2-second clips of both audio and video inputs.
