@@ -61,17 +61,25 @@ if __name__ == "__main__":
 
         frames, audio = DataPipeline("data/converted/").get_data()
 
-        # For saving as numpy arrays
-        # np.save("saved_data_np/frames", frames)
-        # np.save("saved_data_np/audio", audio)
-
         print("pre-processed the data")
 
-        frames_dataset = tf.data.Dataset.from_tensors(frames)
-        audio_dataset = tf.data.Dataset.from_tensors(audio)
+        frames = np.array(frames)
+        audio = np.array(audio)
 
-        tf.data.experimental.save(frames_dataset, "saved_data/frames")
-        tf.data.experimental.save(audio_dataset, "saved_data/audio")
+        print("shape of frames: ", frames.shape)
+        print("shape of audio: ", audio.shape)
+
+        # For saving as numpy arrays
+        np.save("saved_data_np/frames", frames)
+        np.save("saved_data_np/audio", audio)
+
+        print("saved data")
+
+        # frames_dataset = tf.data.Dataset.from_tensors(frames)
+        # audio_dataset = tf.data.Dataset.from_tensors(audio)
+
+        # tf.data.experimental.save(frames_dataset, "saved_data/frames")
+        # tf.data.experimental.save(audio_dataset, "saved_data/audio")
 
     # To check the contents of the dataset, like this
     # for data in frames_dataset:
