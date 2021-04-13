@@ -54,8 +54,8 @@ if __name__ == "__main__":
     try:
         print("Retrieving saved Data...")
         start = process_time()
-        visual_data = np.load("converted_data/frames.npy", allow_pickle=True)
-        audio_data = np.load("converted_data/audio.npy", allow_pickle=True)
+        visual_data = np.load("data/frames.npy", allow_pickle=True)
+        audio_data = np.load("data/audio.npy", allow_pickle=True)
         end = process_time()
         print("Data retrieval completed in " + str(end - start) + " seconds!")
 
@@ -64,7 +64,7 @@ if __name__ == "__main__":
 
         print("Preprocessing Raw Video Data...")
         start = process_time()
-        visual_data, audio_data = DataPipeline("/Users/aparna/Downloads/converted/").get_data()
+        visual_data, audio_data = DataPipeline("path to anime lrs2 dataset here").get_data()
 
         visual_data = np.array(visual_data)
         audio_data = np.array(audio_data)
@@ -73,8 +73,8 @@ if __name__ == "__main__":
         print("Preprocessing completed in " + str(end - start) + " seconds!")
 
         # For saving as numpy arrays
-        np.save("converted_data/frames", visual_data, allow_pickle=True)
-        np.save("converted_data/audio", audio_data, allow_pickle=True)
+        np.save("data/frames", visual_data, allow_pickle=True)
+        np.save("data/audio", audio_data, allow_pickle=True)
 
         print("Saved data!")
 
