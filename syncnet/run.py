@@ -51,11 +51,19 @@ if __name__ == "__main__":
         audio_dataset = tf.data.experimental.load("saved_data/audio",
             tf.TensorSpec(shape=(1, 1, 9, 13, 20, 1), dtype=tf.float32, name=None))
 
+        # For loading numpy arrays
+        # np.load("saved_data_np/frames")
+        # np.load("saved_data_np/audio")
+
         print("Retrieving saved dataset...")
     except:
         print("Could not find saved dataset, generating and saving new dataset...")
 
         frames, audio = DataPipeline("data/converted/").get_data()
+
+        # For saving as numpy arrays
+        # np.save("saved_data_np/frames", frames)
+        # np.save("saved_data_np/audio", audio)
 
         print("pre-processed the data")
 

@@ -18,8 +18,9 @@ class DataPipeline:
         self.audio_inputs = []
         self.visual_inputs = []
         for root, dirs, files in os.walk(data_path):
-            for file in files:
+            for i,file in enumerate(files):
                 if file.endswith(".mp4"):
+                    print(f"Preprocessing video/audio pair {i}/{len(files)}...")
                     self.format_video(root + "/" + file)
 
     """
@@ -33,11 +34,11 @@ class DataPipeline:
 
     def format_video(self, video_path):
         _25_fps_video_path = os.path.dirname(video_path) + "/_25_fps.mp4"
-        os.system("ffmpeg -i " + video_path + " -filter:v fps=25 " + _25_fps_video_path)
+        os.system("ffmpeg -i " + video_path + " -filter:v fps=25 " + _25_fps_video_path + " >/dev/null 2>&1")
         frames = self.format_input_visual(_25_fps_video_path)
 
         audio_path = os.path.dirname(video_path) + "/audio.wav"
-        os.system("ffmpeg -i " + video_path + " " + audio_path)
+        os.system("ffmpeg -i " + video_path + " " + audio_path + " >/dev/null 2>&1")
         mfcc = self.format_input_audio(audio_path)
 
         frames, mfccs = self.trim_mfcc_and_visual(frames, mfcc)
@@ -126,7 +127,12 @@ class DataPipeline:
     @staticmethod
     def format_input_visual(video_path):
         video = cv2.VideoCapture(video_path)
-        assert (video.get(cv2.CAP_PROP_FPS) == 25)
+        try:
+            assert (video.get(cv2.CAP_PROP_FPS) == 25)
+        except:
+            print("Video path that failed: ", video_path)
+            exit()
+
         success, frame = video.read()
         frames = []
         while success:
