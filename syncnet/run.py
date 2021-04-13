@@ -54,8 +54,8 @@ if __name__ == "__main__":
     try:
         print("Retrieving saved Data...")
         start = process_time()
-        visual_data = np.load("data/frames.npy", allow_pickle=True)
-        audio_data = np.load("data/audio.npy", allow_pickle=True)
+        visual_data = np.load("data/frames.npy")
+        audio_data = np.load("data/audio.npy")
         end = process_time()
         print("Data retrieval completed in " + str(end - start) + " seconds!")
 
@@ -73,8 +73,8 @@ if __name__ == "__main__":
         print("Preprocessing completed in " + str(end - start) + " seconds!")
 
         # For saving as numpy arrays
-        np.save("data/frames", visual_data, allow_pickle=True)
-        np.save("data/audio", audio_data, allow_pickle=True)
+        np.save("data/frames", visual_data)
+        np.save("data/audio", audio_data)
 
         print("Saved data!")
 
