@@ -4,19 +4,14 @@ import python_speech_features
 import numpy as np
 import os
 import subprocess
-
+from time import process_time
 
 class DataPipeline:
     def __init__(self, data_path):
-        self.audio_inputs = []
+        self.data_path = data_path
         self.visual_inputs = []
-        for root, dirs, files in os.walk(data_path):
-            for i, file in enumerate(files):
-                if file.endswith(".mp4"):
-                    video_path = root + "/" + file
-                    print(f"Preprocessing video {video_path}...")
-                    self.format_video(video_path)
-
+        self.audio_inputs = []
+        self.is_synced_labels = []
     """
     * The network ingests 0.2-second clips of both audio and video inputs.
     This function...
@@ -36,6 +31,7 @@ class DataPipeline:
 
             self.visual_inputs.extend(frames)
             self.audio_inputs.extend(mfccs)
+
         finally:
             self.delete_file(tmp_video_path)
             self.delete_file(tmp_audio_path)
@@ -142,9 +138,82 @@ class DataPipeline:
 
         return self.group_frames(frames)
 
+    def get_shuffled_and_label_data(self):
+        visual_data = np.array(self.visual_inputs)
+        audio_data = np.array(self.audio_inputs)
+
+        num_data_points = visual_data.shape[0]
+
+        half_way_mark = num_data_points // 2
+
+        # break data in 1/2
+        # shuffle second half to create "false" data
+        false_visual_data = visual_data[half_way_mark:num_data_points]
+        np.random.shuffle(false_visual_data)
+        visual_data[half_way_mark:num_data_points] = false_visual_data
+
+        false_audio_data = audio_data[half_way_mark:num_data_points]
+        np.random.shuffle(false_audio_data)
+        audio_data[half_way_mark:num_data_points] = false_audio_data
+
+        is_synced_labels = np.ones(num_data_points)
+        is_synced_labels[half_way_mark:num_data_points] = 0
+
+        new_idx_order = np.arange(num_data_points)
+        np.random.shuffle(new_idx_order)
+
+        # shuffle the labels and pairs together
+        visual_data = visual_data[new_idx_order]
+        audio_data = audio_data[new_idx_order]
+        is_synced_labels = is_synced_labels[new_idx_order]
+
+        return visual_data, audio_data, is_synced_labels
+
     def get_data(self):
         # Returns list with tensors
-        return self.visual_inputs, self.audio_inputs
+        try:
+            print("Retrieving saved data...")
+            start = process_time()
+            visual_data = np.load("data/frames.npy")
+            audio_data = np.load("data/audio.npy")
+            is_synced_labels = np.load("data/labels.npy")
+            end = process_time()
+            print("Data retrieval completed in " + str(end - start) + " seconds!")
+
+        except:
+
+            print("Could not find saved dataset, generating and saving new dataset...")
+
+            print("Preprocessing Raw Video Data...")
+            start = process_time()
+            for root, dirs, files in os.walk(self.data_path):
+                for i, file in enumerate(files):
+                    if file.endswith(".mp4"):
+                        video_path = root + "/" + file
+                        print(f"Preprocessing video {video_path}...")
+                        self.format_video(video_path)
+            print("Done processing Raw Videos! Shuffling, labeling and saving processed data...")
+            visual_data, audio_data, is_synced_labels = self.get_shuffled_and_label_data()
+
+            # For saving as numpy arrays
+            np.save("data/frames", visual_data)
+            np.save("data/audio", audio_data)
+            np.save("data/labels", is_synced_labels)
+            print("Saved data!")
+            end = process_time()
+            print("Preprocessing completed in " + str(end - start) + " seconds!")
+
+        assert (visual_data.shape[0] == audio_data.shape[0])
+        num_data_points = len(is_synced_labels)
+        print("Number of Data Points: ", num_data_points)
+        print("Shape of Visual Data: ", visual_data.shape)
+        print("Shape of Audio Data: ", audio_data.shape)
+
+        self.visual_inputs = visual_data
+        self.audio_inputs = audio_data
+        self.is_synced_labels = is_synced_labels
+
+        return self.visual_inputs, self.audio_inputs, self.is_synced_labels
 
     def get_and_create_tmp_video_audio_files(self, video_path):
         _, video_name = os.path.split(video_path)

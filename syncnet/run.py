@@ -51,34 +51,4 @@ def train(visual_tensors, audio_tensors, is_synced_labels):
 
 if __name__ == "__main__":
 
-    try:
-        print("Retrieving saved Data...")
-        start = process_time()
-        visual_data = np.load("converted_data/frames.npy", allow_pickle=True)
-        audio_data = np.load("converted_data/audio.npy", allow_pickle=True)
-        end = process_time()
-        print("Data retrieval completed in " + str(end - start) + " seconds!")
-
-    except:
-        print("Could not find saved dataset, generating and saving new dataset...")
-
-        print("Preprocessing Raw Video Data...")
-        start = process_time()
-        visual_data, audio_data = DataPipeline("/Users/aparna/Downloads/converted/").get_data()
-
-        visual_data = np.array(visual_data)
-        audio_data = np.array(audio_data)
-
-        end = process_time()
-        print("Preprocessing completed in " + str(end - start) + " seconds!")
-
-        # For saving as numpy arrays
-        np.save("converted_data/frames", visual_data, allow_pickle=True)
-        np.save("converted_data/audio", audio_data, allow_pickle=True)
-
-        print("Saved data!")
-
-    assert (visual_data.shape[0] == audio_data.shape[0])
-    print("Number of Data Points: ", visual_data.shape[0])
-    print("Shape of Visual Data: ", visual_data.shape)
-    print("Shape of Audio Data: ", audio_data.shape)
+    DataPipeline("/Users/aparna/Downloads/converted").get_data()
