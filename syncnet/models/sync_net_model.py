@@ -6,10 +6,10 @@ import time
 
 from .hyperparameters import learning_rate, batch_size, epochs
 
-class SyncNet(object):
 
 # https://medium.com/predict/face-recognition-from-scratch-using-siamese-networks-and-tensorflow-df03e32f8cd0
 
+class SyncNet(object):
     def __init__(self):
         self.audio_architecture = [
             Conv2D(64, kernel_size=(3, 3), strides=(1, 1)),
@@ -81,7 +81,7 @@ class SyncNet(object):
             BatchNormalization(),
             ReLU(),
             MaxPool3D(pool_size=(1, 3, 3), strides=(1, 2, 2)),
-            
+
             Conv3D(512, kernel_size=(1, 6, 6), data_format="channels_last"),
             ZeroPadding3D(padding=0),
             BatchNormalization(),
@@ -103,28 +103,30 @@ class SyncNet(object):
         visual_output = visual_model(visual_input)
         audio_output = audio_model(audio_input)
 
-        euclidean_distance = tf.keras.layers.Lambda(lambda tensors: K.l2_normalize(tensors[0] - tensors[1]))([visual_output, audio_output])
+        euclidean_distance = tf.keras.layers.Lambda(lambda tensors: K.l2_normalize(tensors[0] - tensors[1]))(
+            [visual_output, audio_output])
 
         outputs = Dense(1, activation=tf.keras.activations.sigmoid)(euclidean_distance)
 
         self.__sync_net = tf.keras.models.Model([audio_input, visual_input], outputs)
-        self.__sync_net.compile( loss=tf.keras.losses.binary_crossentropy, optimizer=tf.keras.optimizers.Adam(lr=learning_rate))
-    
-    def train(self, video_inputs, audio_inputs, labels):
-        inputs = [video_inputs, audio_inputs]
+        self.__sync_net.compile(loss=tf.keras.losses.binary_crossentropy,
+                                optimizer=tf.keras.optimizers.Adam(lr=learning_rate))
+
+    def train(self, visual_inputs, audio_inputs, labels):
+        inputs = [visual_inputs, audio_inputs]
         initial_time = time.time()
         self.__sync_net.summary()
         self.__sync_net.fit(inputs, labels,
-                                            batch_size=batch_size,
-                                            epochs=epochs
-        )
+                            batch_size=batch_size,
+                            epochs=epochs
+                            )
         final_time = time.time()
-        eta = ( final_time - initial_time )
+        eta = (final_time - initial_time)
         time_unit = 'seconds'
         if eta >= 60:
             eta = eta / 60
             time_unit = 'minutes'
-        print( 'Elapsed time acquired for {} epoch(s) -> {} {}'.format( epochs , eta , time_unit ) )
+        print('Elapsed time acquired for {} epoch(s) -> {} {}'.format(epochs, eta, time_unit))
 
     def summary(self):
         self.__sync_net.summary()
@@ -138,5 +140,5 @@ class SyncNet(object):
     def predict(self, input):
         return self.__sync_net.predict(input)
 
-    def evaluate(self , test_X , test_Y  ) :
-        return self.__sync_net.evaluate(test_X, test_Y)
+    def evaluate(self, inputs, labels):
+        return self.__sync_net.evaluate(inputs, labels)
