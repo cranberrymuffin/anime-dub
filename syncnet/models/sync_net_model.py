@@ -107,7 +107,7 @@ class SyncNet(object):
 
         outputs = Dense(1, activation=tf.keras.activations.sigmoid)(euclidean_distance)
 
-        self.__sync_net = tf.keras.models.Model([visual_input, audio_input], outputs)
+        self.__sync_net = tf.keras.models.Model([audio_input, visual_input], outputs)
         self.__sync_net.compile( loss=tf.keras.losses.binary_crossentropy, optimizer=tf.keras.optimizers.Adam(lr=learning_rate))
     
     def train(self, video_inputs, audio_inputs, labels):
