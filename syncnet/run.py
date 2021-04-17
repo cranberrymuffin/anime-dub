@@ -13,7 +13,7 @@ parser = argparse.ArgumentParser(description='SyncNet Run Parameters')
 parser.add_argument('--mode', type=str, required=True, choices=["train", "test", "val"], help='run mode')
 
 parser.add_argument('--data_dir', type=str, required=False, default=None, help='path to data directory')
-parser.add_argument('--checkpoint_dir', type=str, required=False, default=None, help='path to checkpoint directory')
+parser.add_argument('--checkpoint-dir', type=str, required=False, default=None, help='path to checkpoint directory')
 parser.add_argument('--load-from', type=str, required=False, default=None, help='path to checkpoint file to load model from')
 parser.add_argument('--load-limit', type=str, required=False, default=30000, help='limit on training data points to load')
 
