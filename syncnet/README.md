@@ -1,11 +1,20 @@
-### Requirements
+# Synnet: Expert Lipsync Discriminator
 
-`brew install ffmpeg`
+## Directions to Run
 
-### Data
+### Training
 
-Unzip the current converted.zip file into `syncnet/data`.
+1. No preprocessed data, no checkpoint:
+`python run.py --mode train --data-dir <PATH TO DATA DIRECTORY (containing .mp4 files)>`
 
-If saved_data does not contain the tf.data.Datasets for the audio and
-video, then preprocess will generate these datasets using the data in that converted/ file from
-the zip. Otherwise, it will load the preprocessed datasets.
+2. No processed data to train model with, pick up training from checkpoint:
+`python run.py --mode train --data-dir <PATH TO DATA DIRECTORY (containing .mp4 files)> --load-from <path to saved model (.h5 file)>`
+
+3. Data preprocessed (.npy files exist in data directory), no checkpoint:
+`python run.py --mode train`
+
+4. Data preprocessed (.npy files exist in data directory), pick up training from checkpoint:
+`python run.py --mode train  --load-from <path to saved model (.h5 file)>`
+
+### Testing
+`python run.py --mode test --load-from <path to saved model (.h5 file)>`
