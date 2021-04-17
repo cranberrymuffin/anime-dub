@@ -12,6 +12,7 @@ from .hyperparameters import learning_rate, batch_size, epochs
 class SyncNet(object):
     def __init__(self, checkpoint_path=None):
         if checkpoint_path is not None:
+            print("Setting model from saved checkpoint at " + checkpoint_path)
             self.__sync_net = tf.keras.models.load_model(checkpoint_path)
         else:
             self.audio_architecture = [
