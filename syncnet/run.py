@@ -44,20 +44,20 @@ if __name__ == "__main__":
     sync_net = SyncNet(args.load_from)
     print(args.mode)
 
-    if args.mode is "train" or args.mode is "test":
+    if args.mode == "train" or args.mode == "test":
         visual_inputs, audio_inputs, is_synced_labels = DataPipeline(args.data_dir, args.load_limit).get_data()
         split_data = split_data(visual_inputs, audio_inputs, is_synced_labels)
         (train_visual_inputs, train_audio_inputs, train_labels) = split_data[0]
         (test_visual_inputs, test_audio_inputs, test_labels) = split_data[1]
 
-    if args.mode is "train":
+    if args.mode == "train":
         if args.checkpoint_dir is None:
             print("Must specify a checkpoint directory in train mode. Please specify one with the \'--checkpoint-dir\' flag")
             exit()
         sync_net.train(train_visual_inputs, train_audio_inputs, train_labels)
         sync_net.evaluate(test_visual_inputs, test_audio_inputs, test_labels)
         sync_net.save_model(args.checkpoint_dir + "/" + str(current_milli_time) + "_model.h5")
-    elif args.mode is "test":
+    elif args.mode == "test":
         if args.load_from is None:
             print("Must specify a checkpoint file in test mode. Please specify one with the \'--load-from\' flag")
             exit()
