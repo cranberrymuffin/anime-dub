@@ -112,7 +112,7 @@ class SyncNet(object):
         self.__sync_net.compile(loss=tf.keras.losses.binary_crossentropy,
                                 optimizer=tf.keras.optimizers.Adam(lr=learning_rate),
                                 metrics=[
-                                    metrics.CategoricalAccuracy(name='accuracy')
+                                    metrics.SparseCategoricalAccuracy(name='accuracy')
                                 ])
 
     def train(self, visual_inputs, audio_inputs, labels):
