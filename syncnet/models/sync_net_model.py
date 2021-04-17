@@ -110,8 +110,8 @@ class SyncNet(object):
 
         self.__sync_net = tf.keras.models.Model([audio_input, visual_input], outputs)
         self.__sync_net.compile(loss=tf.keras.losses.binary_crossentropy,
-                                optimizer=tf.keras.optimizers.SGD(learning_rate=learning_rate),
-                                metrics=[tf.keras.metrics.BinaryCrossentropy()])
+                                optimizer=tf.keras.optimizers.Adam(learning_rate=learning_rate),
+                                metrics=['accuracy'])
 
     def train(self, visual_inputs, audio_inputs, labels):
         inputs = [visual_inputs, audio_inputs]
