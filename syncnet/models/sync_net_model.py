@@ -131,9 +131,8 @@ class SyncNet(object):
             time_unit = 'minutes'
         print('Elapsed time acquired for {} epoch(s) -> {} {}'.format(epochs, eta, time_unit))
 
-    def test(self, video_inputs, audio_inputs, labels):
-        results, metrics = self.__sync_net.evaluate([video_inputs, audio_inputs], labels, batch_size=batch_size)
-        print("Test loss, " + results + " Test accuracy: " + metrics['accuracy'])
+    def evaluate(self, video_inputs, audio_inputs, labels):
+        self.__sync_net.evaluate([video_inputs, audio_inputs], labels, batch_size=batch_size)
 
     def summary(self):
         self.__sync_net.summary()

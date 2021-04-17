@@ -27,6 +27,6 @@ if __name__ == "__main__":
 
     sync_net = SyncNet()
     sync_net.train(train_visual_inputs, train_audio_inputs, train_labels)
-    sync_net.test(test_visual_inputs, test_audio_inputs, test_labels)
+    sync_net.evaluate(test_visual_inputs, test_audio_inputs, test_labels)
 
     sync_net.save_model("saved_model/model.h5")
