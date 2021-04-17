@@ -13,7 +13,6 @@ parser = argparse.ArgumentParser(description='SyncNet Run Parameters')
 parser.add_argument('--mode', type=str, required=True, choices=["train", "test", "val"], help='run mode')
 
 parser.add_argument('--data-dir', type=str, required=False, default=None, help='path to data directory')
-parser.add_argument('--checkpoint-dir', type=str, required=False, default=None, help='path to checkpoint directory')
 parser.add_argument('--load-from', type=str, required=False, default=None, help='path to checkpoint file to load model from')
 parser.add_argument('--load-limit', type=str, required=False, default=30000, help='limit on training data points to load')
 
@@ -50,12 +49,9 @@ if __name__ == "__main__":
         (test_visual_inputs, test_audio_inputs, test_labels) = split_data[1]
 
     if args.mode == "train":
-        if args.checkpoint_dir is None:
-            print("Must specify a checkpoint directory in train mode. Please specify one with the \'--checkpoint-dir\' flag")
-            exit()
         sync_net.train(train_visual_inputs, train_audio_inputs, train_labels)
         sync_net.evaluate(test_visual_inputs, test_audio_inputs, test_labels)
-        sync_net.save_model(args.checkpoint_dir + "/" + str(current_milli_time) + "_model.h5")
+        sync_net.save_model("checkpoints/" + str(current_milli_time) + "_model.h5")
     elif args.mode == "test":
         if args.load_from is None:
             print("Must specify a checkpoint file in test mode. Please specify one with the \'--load-from\' flag")
