@@ -192,7 +192,7 @@ class DataPipeline:
                         video_path = root + "/" + file
                         print(f"Preprocessing video {video_path}...")
                         self.format_video(video_path)
-                if self.audio_inputs.shape[0] > 30000:
+                if len(self.audio_inputs) > 30000:
                     break
             print("Done processing Raw Videos! Shuffling, labeling and saving processed data...")
             visual_data, audio_data, is_synced_labels = self.get_shuffled_and_label_data()
