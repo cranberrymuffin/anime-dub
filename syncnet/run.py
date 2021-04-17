@@ -14,7 +14,7 @@ parser.add_argument('--mode', type=str, required=True, choices=["train", "test",
 
 parser.add_argument('--data-dir', type=str, required=False, default=None, help='path to data directory')
 parser.add_argument('--load-from', type=str, required=False, default=None, help='path to checkpoint file to load model from')
-parser.add_argument('--load-limit', type=str, required=False, default=30000, help='limit on training data points to load')
+parser.add_argument('--load-limit', type=int, required=False, default=30000, help='limit on training data points to load')
 
 parser.add_argument('--val-video', type=str, default=None, required=False, help='video to validate')
 parser.add_argument('--val-visual', type=str, default=None, required=False, help='no audio video to validate')
