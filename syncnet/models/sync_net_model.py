@@ -130,7 +130,7 @@ class SyncNet(object):
 
     def test(self, video_inputs, audio_inputs, labels):
         results = self.__sync_net.evaluate([video_inputs, audio_inputs], labels, batch_size=batch_size)
-        print("Test loss, " + results[0] + " Test accuracy: " + results[1])
+        print("Test loss, " + results['loss'] + " Test accuracy: " + results['accuracy'])
 
     def summary(self):
         self.__sync_net.summary()
@@ -143,7 +143,3 @@ class SyncNet(object):
 
     def predict(self, input):
         return self.__sync_net.predict(input)
-
-    def evaluate(self, inputs, labels):
-        metrics = self.__sync_net.evaluate(inputs, labels)
-        return metrics['loss'], metrics['accuracy']
