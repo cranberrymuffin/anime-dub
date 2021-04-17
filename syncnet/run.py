@@ -61,7 +61,7 @@ if __name__ == "__main__":
         if args.load_from is None:
             print("Must specify a checkpoint file in test mode. Please specify one with the \'--load-from\' flag")
             exit()
-        sync_net.evaluate([test_visual_inputs, test_audio_inputs], test_labels)
+        sync_net.evaluate(test_visual_inputs, test_audio_inputs, test_labels)
     else:
         if args.load_from is None:
             print("Must specify a checkpoint file in validation mode. Please specify one with the \'--load-from\' flag")
