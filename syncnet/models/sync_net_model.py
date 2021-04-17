@@ -103,7 +103,7 @@ class SyncNet(object):
         visual_output = visual_model(visual_input)
         audio_output = audio_model(audio_input)
 
-        euclidean_distance = tf.keras.layers.Lambda(lambda tensors: tf.linalg.norm(tensors[0] - tensors[1]))(
+        euclidean_distance = tf.keras.layers.Lambda(lambda tensors: K.l2_normalize(tensors[0] - tensors[1]))(
             [visual_output, audio_output])
 
         outputs = Dense(1, activation=tf.keras.activations.sigmoid)(euclidean_distance)
