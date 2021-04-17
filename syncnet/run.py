@@ -42,7 +42,6 @@ def split_data(visual_inputs, audio_inputs, is_synced_labels):
 
 if __name__ == "__main__":
     sync_net = SyncNet(args.load_from)
-    print(args.mode)
 
     if args.mode == "train" or args.mode == "test":
         visual_inputs, audio_inputs, is_synced_labels = DataPipeline(args.data_dir, args.load_limit).get_data()
