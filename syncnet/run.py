@@ -4,7 +4,7 @@ from os import path
 from tensorflow import keras
 
 def split_data(visual_inputs, audio_inputs, is_synced_labels):
-    train_idx = int(len(visual_inputs) * 0.90)
+    train_idx = int(len(visual_inputs) * 0.70)
 
     train_visual_inputs = visual_inputs[0:train_idx]
     train_audio_inputs = audio_inputs[0:train_idx]
