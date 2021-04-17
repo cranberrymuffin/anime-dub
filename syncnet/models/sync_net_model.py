@@ -112,8 +112,7 @@ class SyncNet(object):
         self.__sync_net.compile(loss=tf.keras.losses.binary_crossentropy,
                                 optimizer=tf.keras.optimizers.Adam(lr=learning_rate),
                                 metrics=[
-                                    metrics.Accuracy(name='accuracy'),
-                                    metrics.binary_crossentropy(name='loss')
+                                    metrics.Accuracy(name='accuracy')
                                 ])
 
     def train(self, visual_inputs, audio_inputs, labels):
@@ -133,8 +132,8 @@ class SyncNet(object):
         print('Elapsed time acquired for {} epoch(s) -> {} {}'.format(epochs, eta, time_unit))
 
     def test(self, video_inputs, audio_inputs, labels):
-        results = self.__sync_net.evaluate([video_inputs, audio_inputs], labels, batch_size=batch_size)
-        print("Test loss, " + results['loss'] + " Test accuracy: " + results['accuracy'])
+        results, metrics = self.__sync_net.evaluate([video_inputs, audio_inputs], labels, batch_size=batch_size)
+        print("Test loss, " + results + " Test accuracy: " + metrics['accuracy'])
 
     def summary(self):
         self.__sync_net.summary()
