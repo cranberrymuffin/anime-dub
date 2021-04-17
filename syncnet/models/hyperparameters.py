@@ -1,3 +1,3 @@
-learning_rate = 1e-2
-batch_size = 32
+learning_rate = 0.1
+batch_size = 8
 epochs = 10
