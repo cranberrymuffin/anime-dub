@@ -30,7 +30,7 @@ if __name__ == "__main__":
 
     if path.exists("checkpoints/model.h5"):
         model = keras.models.load_model("checkpoints/model.h5")
-        model.evaluate(test_visual_inputs, test_audio_inputs, test_labels)
+        model.evaluate([test_visual_inputs, test_audio_inputs], test_labels)
     else:
         sync_net.train(train_visual_inputs, train_audio_inputs, train_labels)
         sync_net.evaluate(test_visual_inputs, test_audio_inputs, test_labels)
