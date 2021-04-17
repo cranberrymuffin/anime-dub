@@ -7,8 +7,9 @@ import subprocess
 from time import process_time
 
 class DataPipeline:
-    def __init__(self, data_path):
+    def __init__(self, data_path, load_limit):
         self.data_path = data_path
+        self.load_limit = load_limit
         self.visual_inputs = []
         self.audio_inputs = []
         self.is_synced_labels = []
@@ -181,8 +182,11 @@ class DataPipeline:
             print("Data retrieval completed in " + str(end - start) + " seconds!")
 
         except:
-
             print("Could not find saved dataset, generating and saving new dataset...")
+
+            if self.data_path is None:
+                print("No saved dataset, you must specify a data directory to load and process data from!")
+                exit()
 
             print("Preprocessing Raw Video Data...")
             start = process_time()
@@ -192,8 +196,9 @@ class DataPipeline:
                         video_path = root + "/" + file
                         print(f"Preprocessing video {video_path}...")
                         self.format_video(video_path)
-                if len(self.audio_inputs) > 30000:
+                if len(self.audio_inputs) >= self.load_limit or len(self.visual_inputs) >= self.load_limit:
                     break
+
             print("Done processing Raw Videos! Shuffling, labeling and saving processed data...")
             visual_data, audio_data, is_synced_labels = self.get_shuffled_and_label_data()
 
