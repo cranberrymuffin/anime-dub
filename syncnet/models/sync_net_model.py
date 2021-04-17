@@ -3,7 +3,7 @@ from tensorflow.keras.layers import Conv2D, MaxPool2D, ZeroPadding2D, Conv3D, Re
     BatchNormalization, Flatten, ZeroPadding3D
 import tensorflow.keras.backend as K
 import time
-
+import tensorflow.keras.metrics as metrics
 from .hyperparameters import learning_rate, batch_size, epochs
 
 
@@ -110,7 +110,11 @@ class SyncNet(object):
 
         self.__sync_net = tf.keras.models.Model([audio_input, visual_input], outputs)
         self.__sync_net.compile(loss=tf.keras.losses.binary_crossentropy,
-                                optimizer=tf.keras.optimizers.Adam(lr=learning_rate))
+                                optimizer=tf.keras.optimizers.Adam(lr=learning_rate),
+                                metrics=[
+                                    metrics.Accuracy(name='accuracy'),
+                                    metrics.binary_crossentropy(name='loss')
+                                ])
 
     def train(self, visual_inputs, audio_inputs, labels):
         inputs = [visual_inputs, audio_inputs]
