@@ -39,7 +39,7 @@ def split_data(visual_inputs, audio_inputs, is_synced_labels):
 
     return split_data
 
-def augment_data(visual_inputs, audio_inputs):
+def augment_data(audio_inputs, visual_inputs):
     #for input_idx, audio_input in enumerate(audio_inputs):
     #    for mfcc_idx, mfcc in enumerate(audio_input):
     #        audio_inputs[input_idx][mfcc_idx] = audio_inputs[input_idx][mfcc_idx][1:, :, :]

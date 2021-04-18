@@ -58,7 +58,6 @@ class DataPipeline:
         mfcc_groups = [np.expand_dims(mfcc, axis=-1) for mfcc in mfcc_groups]
 
         for mfcc_group in mfcc_groups:
-            print(mfcc_group.shape)
             assert (mfcc_group.shape == (13, 20, 1))
 
         return mfcc_groups
