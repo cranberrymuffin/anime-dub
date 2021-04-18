@@ -57,7 +57,7 @@ class Speech2Vid:
             x = self.transposed_convolution(x, 64, 5, 2)
             decoded = Conv2DTranspose(3, (5, 5), strides=2, activation='sigmoid', padding='same')(x)
 
-            self.__speech2vid = tf.keras.models.Model(inputs=[input_audio, input_identity], outputs=[decoded])
+            self.__speech2vid_net = tf.keras.models.Model(inputs=[input_audio, input_identity], outputs=[decoded])
 
         self.__speech2vid_net.compile(loss='mean_absolute_error',
                                       optimizer=tf.keras.optimizers.Adam(learning_rate=learning_rate),
