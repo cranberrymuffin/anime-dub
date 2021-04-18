@@ -1,4 +1,4 @@
-from data.preprocess import DataPipeline
+from ..data.preprocess import DataPipeline
 from models.sync_net_model import SyncNet
 import argparse
 import time
