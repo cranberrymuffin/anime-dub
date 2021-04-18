@@ -52,8 +52,7 @@ def augment_data(visual_inputs, audio_inputs):
         for frame_idx, frame in enumerate(visual_input):
             blw_mouth = cv2.cvtColor(frame, cv2.COLOR_RGB2GRAY)[frame.shape[0] // 2:frame.shape[0], :]
             blw_mouth = cv2.resize(blw_mouth, (224, 224))
-            blw_inputs[input_idx][frame_idx] = blw_mouth
-        blw_inputs[input_idx] = np.expand_dims(visual_input, axis=-1)
+            blw_inputs[input_idx][frame_idx] =  np.expand_dims(blw_mouth, axis=-1)
         assert(blw_inputs[input_idx].shape == (5, 224, 224, 1))
 
         return blw_inputs, audio_input
