@@ -1,26 +1,32 @@
-from preprocess import DataPipeline
-from models.speech2vid_model import Speech2Vid
+from speech2vid.models.speech2vid_model import Speech2Vid
 import argparse
 import time
 import cv2
+import preprocess
 import numpy as np
+import random
+
 
 def current_milli_time():
     return round(time.time() * 1000)
+
 
 parser = argparse.ArgumentParser(description='Speech2Vid Run Parameters')
 
 parser.add_argument('--mode', type=str, required=True, choices=["train", "test", "val"], help='run mode')
 
 parser.add_argument('--data-dir', type=str, required=False, default=None, help='path to data directory')
-parser.add_argument('--load-from', type=str, required=False, default=None, help='path to checkpoint file to load model from')
-parser.add_argument('--load-limit', type=int, required=False, default=30000, help='limit on training data points to load')
+parser.add_argument('--load-from', type=str, required=False, default=None,
+                    help='path to checkpoint file to load model from')
+parser.add_argument('--load-limit', type=int, required=False, default=30000,
+                    help='limit on training data points to load')
 
 parser.add_argument('--val-video', type=str, default=None, required=False, help='video to validate')
 parser.add_argument('--val-visual', type=str, default=None, required=False, help='no audio video to validate')
 parser.add_argument('--val-audio', type=str, default=None, required=False, help='audio to validate')
 
 args = parser.parse_args()
+
 
 def split_data(visual_inputs, audio_inputs, is_synced_labels):
     train_idx = int(len(visual_inputs) * 0.70)
@@ -39,25 +45,28 @@ def split_data(visual_inputs, audio_inputs, is_synced_labels):
 
     return split_data
 
-def augment_data(labels, audio_inputs):
+
+def augment_data(visual_inputs, audio_inputs):
     for input_idx, mfcc in enumerate(audio_inputs):
-        audio_inputs[input_idx] = audio_inputs[input_idx][1:, :, :]
-        assert(audio_inputs[input_idx].shape == (12, 20, 1))
+        assert (audio_inputs[input_idx].shape == (13, 20, 1))
 
-    visual_inputs = []
-    for input_idx, set_of_5_frames in enumerate(labels):
-        for frame_idx, frame in enumerate(set_of_5_frames):
-            labels[input_idx][frame_idx] = cv2.resize(visual_inputs[input_idx][frame_idx], (112, 112))
-        assert(labels[input_idx].shape == (5, 112, 112))
-        visual_inputs.append(set_of_5_frames[2])
+    augmented_visual_inputs = []
+    labels = []
 
-        return visual_inputs, audio_inputs, labels
+    for input_idx, set_of_5_frames in enumerate(visual_inputs):
+        augmented_visual_inputs.append(cv2.resize(random.choice(set_of_5_frames), (112, 112)))
+        labels.append(cv2.resize(set_of_5_frames[2], (112, 112)))
+        assert (augmented_visual_inputs[input_idx].shape == (112, 112, 3))
+        assert (labels[input_idx].shape == (112, 112, 3))
+    return np.array(augmented_visual_inputs), audio_inputs, np.array(labels)
+
 
 if __name__ == "__main__":
     speech2vid_net = Speech2Vid(args.load_from)
 
     if args.mode == "train" or args.mode == "test":
-        visual_inputs, audio_inputs, is_synced_labels = DataPipeline(args.data_dir, args.load_limit).get_data()
+        visual_inputs, audio_inputs, is_synced_labels = preprocess.DataPipeline(args.data_dir,
+                                                                                args.load_limit).get_data()
         visual_inputs, audio_inputs, labels = augment_data(visual_inputs, audio_inputs)
         split_data = split_data(visual_inputs, audio_inputs, labels)
         (train_visual_inputs, train_audio_inputs, train_labels) = split_data[0]
@@ -66,7 +75,7 @@ if __name__ == "__main__":
     if args.mode == "train":
         speech2vid_net.train(train_visual_inputs, train_audio_inputs, train_labels)
         speech2vid_net.evaluate(test_visual_inputs, test_audio_inputs, test_labels)
-        speech2vid_net.save_model("checkpoints/" + str(current_milli_time) + "_model.h5")
+        speech2vid_net.save_model("speech2vid/checkpoints/" + str(current_milli_time()) + "_model.h5")
     elif args.mode == "test":
         if args.load_from is None:
             print("Must specify a checkpoint file in test mode. Please specify one with the \'--load-from\' flag")
@@ -84,12 +93,13 @@ if __name__ == "__main__":
                       "--args.val_audio will be ignored.")
 
             print("Evaluating synchronicity of input video at " + args.val_video)
-            #TODO EVAL
+            # TODO EVAL
 
-        elif not(args.val_visual is not None and args.val_audio is not None):
+        elif not (args.val_visual is not None and args.val_audio is not None):
             print("ERROR: --val_visual .mp4 path must be passed with a --val_audio .wav path. To pass a single video "
                   "containing audio please use the --args.val_video flag.")
             exit()
 
-            print("Evaluating synchronicity of input visual at " + args.val_video + " with input audio at " + args.val_audio)
-            #TODO EVAL
+            print(
+                "Evaluating synchronicity of input visual at " + args.val_video + " with input audio at " + args.val_audio)
+            # TODO EVAL

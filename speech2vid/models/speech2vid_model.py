@@ -10,11 +10,11 @@ class Speech2Vid:
     def __init__(self, checkpoint_path=None):
         if checkpoint_path is not None:
             print("Setting model from saved checkpoint at " + checkpoint_path)
-            self.__sync_net = tf.keras.models.load_model(checkpoint_path)
+            self.__speech2vid_net = tf.keras.models.load_model(checkpoint_path)
         else:
 
             # Audio encoder
-            input_audio = Input(shape=(12, 20, 1))
+            input_audio = Input(shape=(13, 20, 1))
 
             x = self.convolution(input_audio, 64, 3)
             x = self.convolution(x, 128, 3)
@@ -57,33 +57,34 @@ class Speech2Vid:
             x = self.transposed_convolution(x, 64, 5, 2)
             decoded = Conv2DTranspose(3, (5, 5), strides=2, activation='sigmoid', padding='same')(x)
 
-            self.__speech2vid = tf.keras.models.Model(inputs=[input_audio, input_identity], outputs=[decoded])
+            self.__speech2vid_net = tf.keras.models.Model(inputs=[input_audio, input_identity], outputs=[decoded])
 
-        self.__sync_net.compile(loss='mean_absolute_error',
-                                optimizer=tf.keras.optimizers.Adam(learning_rate=learning_rate),
-                                metrics=['accuracy'])
+        self.__speech2vid_net.compile(loss='mean_absolute_error',
+                                      optimizer=tf.keras.optimizers.Adam(learning_rate=learning_rate),
+                                      metrics=['accuracy'])
 
-    def convolution(self, x, filters, kernel_size=3, strides=1, padding='same'):
+    @staticmethod
+    def convolution(x, filters, kernel_size=3, strides=1, padding='same'):
         x = Conv2D(filters=filters, kernel_size=kernel_size, strides=strides, padding=padding)(x)
         x = BatchNormalization(momentum=.8)(x)
         x = Activation('relu')(x)
         return x
 
-    def transposed_convolution(self, x, filters, kernel_size=3, strides=1, padding='same'):
-        x = Conv2DTranspose(filters=filters, kernel_size=kernel_size, strides=strides, \
-                            padding=padding)(x)
+    @staticmethod
+    def transposed_convolution(x, filters, kernel_size=3, strides=1, padding='same'):
+        x = Conv2DTranspose(filters=filters, kernel_size=kernel_size, strides=strides, padding=padding)(x)
         x = BatchNormalization(momentum=.8)(x)
         x = Activation('relu')(x)
         return x
 
     def train(self, visual_inputs, audio_inputs, labels):
-        inputs = [visual_inputs, audio_inputs]
+        inputs = [audio_inputs, visual_inputs]
         initial_time = time.time()
-        self.__sync_net.summary()
-        self.__sync_net.fit(inputs, labels,
-                            batch_size=batch_size,
-                            epochs=epochs
-                            )
+        self.__speech2vid_net.summary()
+        self.__speech2vid_net.fit(inputs, labels,
+                                  batch_size=batch_size,
+                                  epochs=epochs
+                                  )
         final_time = time.time()
         eta = (final_time - initial_time)
         time_unit = 'seconds'
@@ -93,16 +94,16 @@ class Speech2Vid:
         print('Elapsed time acquired for {} epoch(s) -> {} {}'.format(epochs, eta, time_unit))
 
     def evaluate(self, video_inputs, audio_inputs, labels):
-        self.__sync_net.evaluate([video_inputs, audio_inputs], labels, batch_size=batch_size)
+        self.__speech2vid_net.evaluate([audio_inputs, video_inputs], labels, batch_size=batch_size)
 
     def summary(self):
-        self.__sync_net.summary()
+        self.__speech2vid_net.summary()
 
     def save_model(self, file_path):
-        self.__sync_net.save(file_path)
+        self.__speech2vid_net.save(file_path)
 
     def load_model(self, file_path):
-        self.__sync_net.load_model(file_path)
+        self.__speech2vid_net.load_model(file_path)
 
     def predict(self, input):
-        return self.__sync_net.predict(input)
+        return self.__speech2vid_net.predict(input)

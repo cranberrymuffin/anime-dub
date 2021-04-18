@@ -118,7 +118,9 @@ class SyncNet(object):
                                 metrics=['accuracy'])
 
     def train(self, visual_inputs, audio_inputs, labels):
-        inputs = [visual_inputs, audio_inputs]
+        print(audio_inputs.shape)
+        print(visual_inputs.shape)
+        inputs = [audio_inputs, visual_inputs]
         initial_time = time.time()
         self.__sync_net.summary()
         self.__sync_net.fit(inputs, labels,
@@ -134,7 +136,7 @@ class SyncNet(object):
         print('Elapsed time acquired for {} epoch(s) -> {} {}'.format(epochs, eta, time_unit))
 
     def evaluate(self, video_inputs, audio_inputs, labels):
-        self.__sync_net.evaluate([video_inputs, audio_inputs], labels, batch_size=batch_size)
+        self.__sync_net.evaluate([audio_inputs, video_inputs], labels, batch_size=batch_size)
 
     def summary(self):
         self.__sync_net.summary()
