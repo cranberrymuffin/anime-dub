@@ -4,8 +4,7 @@ import time
 import cv2
 import numpy as np
 import sys
-sys.path.append('/.../anime-dub/data')
-from preprocess import DataPipeline
+from data.preprocess import DataPipeline
 
 def current_milli_time():
     return round(time.time() * 1000)
