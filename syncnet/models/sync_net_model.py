@@ -118,7 +118,7 @@ class SyncNet(object):
                                 metrics=['accuracy'])
 
     def train(self, visual_inputs, audio_inputs, labels):
-        inputs = [visual_inputs, audio_inputs]
+        inputs = [audio_inputs, audio_inputs]
         initial_time = time.time()
         self.__sync_net.summary()
         self.__sync_net.fit(inputs, labels,
