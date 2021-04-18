@@ -1,11 +1,8 @@
-from models.sync_net_model import SyncNet
+from syncnet.models.sync_net_model import SyncNet
 import argparse
 import time
 import cv2
 import numpy as np
-import sys
-from os import path
-sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
 import preprocess
 
 def current_milli_time():

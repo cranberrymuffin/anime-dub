@@ -1,7 +1,4 @@
-import sys
-from os import path
-sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
-from models.speech2vid_model import Speech2Vid
+from speech2vid.models.speech2vid_model import Speech2Vid
 import argparse
 import time
 import cv2
