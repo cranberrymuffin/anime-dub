@@ -3,6 +3,7 @@ import argparse
 import time
 import cv2
 import preprocess
+import numpy as np
 
 def current_milli_time():
     return round(time.time() * 1000)
@@ -43,13 +44,14 @@ def augment_data(labels, audio_inputs):
         assert(audio_inputs[input_idx].shape == (13, 20, 1))
 
     visual_inputs = []
+    processed_labels = np.empty(labels.shape[0], 5, 112, 112, 3)
     for input_idx, set_of_5_frames in enumerate(labels):
         for frame_idx, frame in enumerate(set_of_5_frames):
-            labels[input_idx][frame_idx] = cv2.resize(frame, (112, 112))
-        assert(labels[input_idx].shape == (5, 112, 112,3))
+            processed_labels[input_idx][frame_idx] = cv2.resize(frame, (112, 112))
+        assert(processed_labels[input_idx].shape == (5, 112, 112,3))
         visual_inputs.append(set_of_5_frames[2])
         assert(visual_inputs[input_idx].shape == (112, 112, 3))
-        return visual_inputs, audio_inputs, labels
+        return visual_inputs, audio_inputs, processed_labels
 
 if __name__ == "__main__":
     speech2vid_net = Speech2Vid(args.load_from)
