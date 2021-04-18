@@ -2,7 +2,7 @@ from speech2vid.models.speech2vid_model import Speech2Vid
 import argparse
 import time
 import cv2
-
+import preprocess
 
 def current_milli_time():
     return round(time.time() * 1000)
@@ -56,7 +56,7 @@ if __name__ == "__main__":
     speech2vid_net = Speech2Vid(args.load_from)
 
     if args.mode == "train" or args.mode == "test":
-        visual_inputs, audio_inputs, is_synced_labels = DataPipeline(args.data_dir, args.load_limit).get_data()
+        visual_inputs, audio_inputs, is_synced_labels = preprocess.DataPipeline(args.data_dir, args.load_limit).get_data()
         visual_inputs, audio_inputs, labels = augment_data(visual_inputs, audio_inputs)
         split_data = split_data(visual_inputs, audio_inputs, labels)
         (train_visual_inputs, train_audio_inputs, train_labels) = split_data[0]
