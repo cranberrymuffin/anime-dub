@@ -3,8 +3,7 @@ import argparse
 import time
 import cv2
 import numpy as np
-import sys
-from data.preprocess import DataPipeline
+from preprocess import DataPipeline
 
 def current_milli_time():
     return round(time.time() * 1000)

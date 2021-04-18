@@ -1,5 +1,4 @@
-import sys
-from data.preprocess import DataPipeline
+from preprocess import DataPipeline
 from models.speech2vid_model import Speech2Vid
 import argparse
 import time
