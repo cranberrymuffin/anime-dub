@@ -40,8 +40,7 @@ def split_data(visual_inputs, audio_inputs, is_synced_labels):
 
 def augment_data(labels, audio_inputs):
     for input_idx, mfcc in enumerate(audio_inputs):
-        audio_inputs[input_idx] = audio_inputs[input_idx][1:, :, :]
-        assert(audio_inputs[input_idx].shape == (12, 20, 1))
+        assert(audio_inputs[input_idx].shape == (13, 20, 1))
 
     visual_inputs = []
     for input_idx, set_of_5_frames in enumerate(labels):

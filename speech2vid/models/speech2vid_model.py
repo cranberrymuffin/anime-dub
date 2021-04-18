@@ -14,7 +14,7 @@ class Speech2Vid:
         else:
 
             # Audio encoder
-            input_audio = Input(shape=(12, 20, 1))
+            input_audio = Input(shape=(13, 20, 1))
 
             x = self.convolution(input_audio, 64, 3)
             x = self.convolution(x, 128, 3)
