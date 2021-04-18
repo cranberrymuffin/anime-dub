@@ -45,7 +45,7 @@ def augment_data(labels, audio_inputs):
     visual_inputs = []
     for input_idx, set_of_5_frames in enumerate(labels):
         for frame_idx, frame in enumerate(set_of_5_frames):
-            labels[input_idx][frame_idx] = cv2.resize(visual_inputs[input_idx][frame_idx], (112, 112))
+            labels[input_idx][frame_idx] = cv2.resize(frame, (112, 112))
         assert(labels[input_idx].shape == (5, 112, 112,3))
         visual_inputs.append(set_of_5_frames[2])
         assert(visual_inputs[input_idx].shape == (112, 112, 3))
