@@ -70,7 +70,7 @@ if __name__ == "__main__":
     if args.mode == "train":
         sync_net.train(train_visual_inputs, train_audio_inputs, train_labels)
         sync_net.evaluate(test_visual_inputs, test_audio_inputs, test_labels)
-        sync_net.save_model("checkpoints/" + str(current_milli_time()) + "_model.h5")
+        sync_net.save_model("syncnet/checkpoints/" + str(current_milli_time()) + "_model.h5")
     elif args.mode == "test":
         if args.load_from is None:
             print("Must specify a checkpoint file in test mode. Please specify one with the \'--load-from\' flag")
