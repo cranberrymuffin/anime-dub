@@ -133,3 +133,5 @@ dmypy.json
 .DS_Store
 *.npy
 *.h5
+
+syncnet/data/converted/*
