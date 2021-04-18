@@ -25,7 +25,7 @@ class DataPipeline:
     def format_video(self, video_path):
         tmp_video_path, tmp_audio_path = self.get_and_create_tmp_video_audio_files(video_path)
         try:
-            frames, mfccs = self.trim_mfcc_and_visual(
+            mfccs, frames = self.trim_mfcc_and_visual(
                 self.format_input_audio(tmp_audio_path),
                 self.format_input_visual(tmp_video_path)
             )
@@ -58,6 +58,7 @@ class DataPipeline:
         mfcc_groups = [np.expand_dims(mfcc, axis=-1) for mfcc in mfcc_groups]
 
         for mfcc_group in mfcc_groups:
+            print(mfcc_group.shape)
             assert (mfcc_group.shape == (13, 20, 1))
 
         return mfcc_groups
