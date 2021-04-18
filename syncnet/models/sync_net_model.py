@@ -136,7 +136,7 @@ class SyncNet(object):
         print('Elapsed time acquired for {} epoch(s) -> {} {}'.format(epochs, eta, time_unit))
 
     def evaluate(self, video_inputs, audio_inputs, labels):
-        self.__sync_net.evaluate([video_inputs, audio_inputs], labels, batch_size=batch_size)
+        self.__sync_net.evaluate([audio_inputs, video_inputs], labels, batch_size=batch_size)
 
     def summary(self):
         self.__sync_net.summary()
