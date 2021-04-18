@@ -47,15 +47,16 @@ def augment_data(visual_inputs, audio_inputs):
     for audio_input in audio_inputs:
         assert(audio_input.shape == (13, 20, 1))
 
+    blw_inputs = np.empty((visual_inputs.shape[0], 5, 224, 224, 1))
     for input_idx, visual_input in enumerate(visual_inputs):
         for frame_idx, frame in enumerate(visual_input):
             blw_mouth = cv2.cvtColor(frame, cv2.COLOR_RGB2GRAY)[frame.shape[0] // 2:frame.shape[0], :]
             blw_mouth = cv2.resize(blw_mouth, (224, 224))
-            visual_inputs[input_idx][frame_idx] = blw_mouth
-        visual_inputs[input_idx] = np.expand_dims(visual_input, axis=-1)
-        assert(visual_inputs[input_idx].shape == (5, 224, 224, 1))
+            blw_inputs[input_idx][frame_idx] = blw_mouth
+        blw_inputs[input_idx] = np.expand_dims(visual_input, axis=-1)
+        assert(blw_inputs[input_idx].shape == (5, 224, 224, 1))
 
-        return visual_input, audio_input
+        return blw_inputs, audio_input
 
 if __name__ == "__main__":
     sync_net = SyncNet(args.load_from)
