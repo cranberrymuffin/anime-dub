@@ -3,7 +3,7 @@ import tensorflow as tf
 from tensorflow.keras.layers import Input, Dense, Conv2D, MaxPooling2D, Flatten, Conv2DTranspose, concatenate, \
     Reshape, BatchNormalization, Activation
 from .hyperparameters import learning_rate, batch_size, epochs
-
+import numpy as np
 
 # tensorflow model lifted from https://github.com/Sindhu-Hegde/you_said_that/blob/master/train.py
 class Speech2Vid:
@@ -77,7 +77,9 @@ class Speech2Vid:
         return x
 
     def train(self, visual_inputs, audio_inputs, labels):
-        inputs = [visual_inputs, audio_inputs]
+        visual_inputs = np.array(visual_inputs)
+        audio_inputs = np.array(audio_inputs)
+        inputs = [audio_inputs, visual_inputs]
         initial_time = time.time()
         self.__speech2vid_net.summary()
         self.__speech2vid_net.fit(inputs, labels,
@@ -93,7 +95,7 @@ class Speech2Vid:
         print('Elapsed time acquired for {} epoch(s) -> {} {}'.format(epochs, eta, time_unit))
 
     def evaluate(self, video_inputs, audio_inputs, labels):
-        self.__speech2vid_net.evaluate([video_inputs, audio_inputs], labels, batch_size=batch_size)
+        self.__speech2vid_net.evaluate([audio_inputs, video_inputs], labels, batch_size=batch_size)
 
     def summary(self):
         self.__speech2vid_net.summary()
