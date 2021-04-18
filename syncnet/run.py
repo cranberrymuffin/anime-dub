@@ -4,7 +4,9 @@ import time
 import cv2
 import numpy as np
 import sys
-from data.preprocess import DataPipeline
+from os import path
+sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
+import preprocess
 
 def current_milli_time():
     return round(time.time() * 1000)
@@ -62,7 +64,7 @@ if __name__ == "__main__":
     sync_net = SyncNet(args.load_from)
 
     if args.mode == "train" or args.mode == "test":
-        visual_inputs, audio_inputs, is_synced_labels = DataPipeline(args.data_dir, args.load_limit).get_data()
+        visual_inputs, audio_inputs, is_synced_labels = preprocess.DataPipeline(args.data_dir, args.load_limit).get_data()
         visual_inputs, audio_inputs = augment_data(visual_inputs, audio_inputs)
         split_data = split_data(visual_inputs, audio_inputs, is_synced_labels)
         (train_visual_inputs, train_audio_inputs, train_labels) = split_data[0]
