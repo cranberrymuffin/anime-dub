@@ -3,7 +3,7 @@ import tensorflow as tf
 from tensorflow.keras.layers import Input, Dense, Conv2D, MaxPooling2D, Flatten, Conv2DTranspose, concatenate, \
     Reshape, BatchNormalization, Activation
 from .hyperparameters import learning_rate, batch_size, epochs
-import numpy as np
+
 
 # tensorflow model lifted from https://github.com/Sindhu-Hegde/you_said_that/blob/master/train.py
 class Speech2Vid:
@@ -63,15 +63,16 @@ class Speech2Vid:
                                       optimizer=tf.keras.optimizers.Adam(learning_rate=learning_rate),
                                       metrics=['accuracy'])
 
-    def convolution(self, x, filters, kernel_size=3, strides=1, padding='same'):
+    @staticmethod
+    def convolution(x, filters, kernel_size=3, strides=1, padding='same'):
         x = Conv2D(filters=filters, kernel_size=kernel_size, strides=strides, padding=padding)(x)
         x = BatchNormalization(momentum=.8)(x)
         x = Activation('relu')(x)
         return x
 
-    def transposed_convolution(self, x, filters, kernel_size=3, strides=1, padding='same'):
-        x = Conv2DTranspose(filters=filters, kernel_size=kernel_size, strides=strides, \
-                            padding=padding)(x)
+    @staticmethod
+    def transposed_convolution(x, filters, kernel_size=3, strides=1, padding='same'):
+        x = Conv2DTranspose(filters=filters, kernel_size=kernel_size, strides=strides, padding=padding)(x)
         x = BatchNormalization(momentum=.8)(x)
         x = Activation('relu')(x)
         return x

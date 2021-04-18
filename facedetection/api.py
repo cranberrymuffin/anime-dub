@@ -1,11 +1,6 @@
 from __future__ import print_function
 import numpy as np
 import cv2
-try:
-    import urllib.request as request_file
-except BaseException:
-    import urllib as request_file
-
 import pathlib
 
 
@@ -23,12 +18,12 @@ class FaceAlignment:
         gray = cv2.equalizeHist(gray)
 
         faces = self.cascade.detectMultiScale(gray,
-                                         # detector options
-                                         scaleFactor=1.1,
-                                         minNeighbors=5,
-                                         minSize=(24, 24))
+                                              # detector options
+                                              scaleFactor=1.1,
+                                              minNeighbors=5,
+                                              minSize=(24, 24))
         (x, y, w, h) = faces[0]
-        return frame[y:y+h, x:x+w]
+        return frame[y:y + h, x:x + w]
 
     def get_detections_for_batch(self, frames):
         face_detections = []
