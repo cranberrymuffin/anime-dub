@@ -1,9 +1,11 @@
-from ..data.preprocess import DataPipeline
 from models.sync_net_model import SyncNet
 import argparse
 import time
 import cv2
 import numpy as np
+import sys
+sys.path.append('/.../data')
+from preprocess import DataPipeline
 
 def current_milli_time():
     return round(time.time() * 1000)
