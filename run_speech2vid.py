@@ -4,7 +4,7 @@ import time
 import cv2
 import preprocess
 import numpy as np
-
+import random
 def current_milli_time():
     return round(time.time() * 1000)
 
@@ -39,20 +39,19 @@ def split_data(visual_inputs, audio_inputs, is_synced_labels):
 
     return split_data
 
-def augment_data(labels, audio_inputs):
+def augment_data(visual_inputs, audio_inputs):
     for input_idx, mfcc in enumerate(audio_inputs):
         assert(audio_inputs[input_idx].shape == (13, 20, 1))
 
-    visual_inputs = []
-    processed_labels = np.empty((labels.shape[0], 5, 112, 112, 3))
-    print(labels.shape[0])
-    for input_idx, set_of_5_frames in enumerate(labels):
-        for frame_idx, frame in enumerate(set_of_5_frames):
-            processed_labels[input_idx][frame_idx] = cv2.resize(frame, (112, 112))
-        assert(processed_labels[input_idx].shape == (5, 112, 112,3))
-        visual_inputs.append(processed_labels[input_idx][2])
-        assert(visual_inputs[input_idx].shape == (112, 112, 3))
-    return visual_inputs, audio_inputs, processed_labels
+    augmented_visual_inputs = []
+    labels = []
+
+    for input_idx, set_of_5_frames in enumerate(visual_inputs):
+        augmented_visual_inputs.append(cv2.resize(random.sample(set_of_5_frames), (112, 112)))
+        labels.append(cv2.resize(set_of_5_frames[2], (112, 112)))
+        assert(augmented_visual_inputs[input_idx].shape == (112, 112, 3))
+        assert(labels[input_idx].shape == (112, 112, 3))
+    return np.array(augmented_visual_inputs), audio_inputs, np.array(labels)
 
 if __name__ == "__main__":
     speech2vid_net = Speech2Vid(args.load_from)

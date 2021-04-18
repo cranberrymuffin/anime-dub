@@ -77,8 +77,6 @@ class Speech2Vid:
         return x
 
     def train(self, visual_inputs, audio_inputs, labels):
-        visual_inputs = np.array(visual_inputs)
-        audio_inputs = np.array(audio_inputs)
         inputs = [audio_inputs, visual_inputs]
         initial_time = time.time()
         self.__speech2vid_net.summary()
