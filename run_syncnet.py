@@ -55,7 +55,7 @@ def augment_data(visual_inputs, audio_inputs):
             blw_inputs[input_idx][frame_idx] =  np.expand_dims(blw_mouth, axis=-1)
         assert(blw_inputs[input_idx].shape == (5, 224, 224, 1))
 
-        return blw_inputs, audio_input
+        return blw_inputs, audio_inputs
 
 if __name__ == "__main__":
     sync_net = SyncNet(args.load_from)
