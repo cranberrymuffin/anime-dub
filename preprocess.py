@@ -79,12 +79,11 @@ class DataPipeline:
             frames = frames[:-to_trim, :, :]
 
         # group frames into sets of 5
-        frames_groups = np.split(frames, frames.shape[0] / 5)
-        frame_groups = [np.expand_dims(group, axis=-1) for group in frames_groups]
+        frame_groups = np.split(frames, frames.shape[0] / 5)
+        #frame_groups = [np.expand_dims(group, axis=-1) for group in frames_groups]
 
-        # for 3D convolution, 224 x 224 image, depth of 5, 1 color channel
         for frame_group in frame_groups:
-            assert (frame_group.shape == (5, 224, 224, 1))
+            assert (frame_group.shape[0] == 5)
 
         return frame_groups
 
@@ -113,10 +112,6 @@ class DataPipeline:
 
     """
     Converts a video clip to sets of 5 frames (at the 25Hz frame rate)
-    
-    Each frame has a black and white mouth region
-    Each frame has the dimension 224×224
-    
     Gives 5 frames for every 0.2 second    
     """
 
@@ -128,14 +123,9 @@ class DataPipeline:
         success, frame = video.read()
         frames = []
         while success:
-            blw_mouth = cv2.cvtColor(frame, cv2.COLOR_RGB2GRAY)[frame.shape[0] // 2:frame.shape[0], :]
-            blw_mouth = cv2.resize(blw_mouth, (224, 224))
-            frames.append(blw_mouth)
+            frames.append(frame)
             success, frame = video.read()
         frames = np.array(frames)
-
-        for frame in frames:
-            assert (frame.shape == (224, 224))
 
         return self.group_frames(frames)
 
