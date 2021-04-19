@@ -154,3 +154,7 @@ class SyncNet(object):
 
     def predict(self, input, steps):
         return self.__sync_net.predict(input, steps=steps)
+
+    def make_untrainable(self):
+        for l in self.__sync_net.layers:
+            l.trainable = False
