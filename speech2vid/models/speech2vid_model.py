@@ -65,20 +65,20 @@ class Speech2Vid:
         
         def loss(audio_inputs, visual_inputs):
             print("INSIDE LOSS")
-            """
-            faces = tf.stack(tf.split(visual_input, num_or_size_splits=5, axis=3), axis=1)
+            faces = tf.stack(tf.split(visual_inputs, num_or_size_splits=5, axis=3), axis=1)
             blw_faces = tf.image.rgb_to_grayscale(faces)
             blw_mouths = blw_faces[:, :, 112//2:,:, :]
             resized_mouths = []
             for i, mouth in enumerate(blw_mouths):
                 resized_mouths.append(tf.image.resize(mouth, [224, 224]))
             visual_inputs = tf.stack(resized_mouths)
-            print(visual_inputs.numpy())
+            print(visual_inputs.get_shape())
             print(audio_inputs.get_shape())
-            """
-            prediction = self.sync_net.model([audio_inputs, visual_inputs], steps=1)
-            print(prediction)
-            return prediction
+            N = audio_inputs.get_shape()[0]
+            Pi_sync = self.sync_net.model([audio_inputs, visual_inputs]).numpy()
+            E = -K.log(Pi_sync)
+            print(E)
+            return E
         
         self.__speech2vid_net.compile(loss=loss,
                                       optimizer=tf.keras.optimizers.Adam(learning_rate=learning_rate),
