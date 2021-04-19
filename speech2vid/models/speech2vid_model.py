@@ -3,9 +3,8 @@ import tensorflow as tf
 from tensorflow.keras.layers import Input, Dense, Conv2D, MaxPooling2D, Flatten, Conv2DTranspose, concatenate, \
     Reshape, BatchNormalization, Activation
 from .hyperparameters import learning_rate, batch_size, epochs
-from numpy import log
 from syncnet.models.sync_net_model import SyncNet
-
+tf.executing_eagerly()
 # tensorflow model lifted from https://github.com/Sindhu-Hegde/you_said_that/blob/master/train.py
 class Speech2Vid:
     def __init__(self, checkpoint_path=None, sync_net_path=None):
@@ -66,7 +65,7 @@ class Speech2Vid:
             def loss(y_true, y_pred):
                 print("INSIDE LOSS")
                 print(tf.squeeze(input_audio, axis=0).get_shape())
-                faces = tf.split(y_pred, num_or_size_splits=3, axis=1)
+                faces = tf.squeeze(tf.stack(tf.split(y_pred, num_or_size_splits=5, axis=3), axis=1), axis=0)
                 print(faces.get_shape())
                 blw_faces = tf.image.rgb_to_grayscale(faces)
                 print(blw_faces.get_shape())
@@ -74,8 +73,10 @@ class Speech2Vid:
                 print(mouth.get_shape())
                 blw_mouth = tf.image.resize(blw_faces, [224, 224])
                 print(blw_mouth.get_shape())
-                blw_mouth = tf.expand_dims(tf.squeeze(blw_mouth, axis=0), axis=0)
-                return - log(self.sync_net.predict([tf.expand_dims(tf.squeeze(input_audio, axis=0), axis=0),tf.expand_dims(blw_mouth[:5, :, :, :], axis=0)], steps=1))
+                blw_mouth = blw_mouth
+                prediction = self.sync_net.predict([tf.expand_dims(tf.squeeze(input_audio, axis=0), axis=0),tf.expand_dims(blw_mouth[:5, :, :, :], axis=0)], steps=1)
+                print(prediction)
+                return -tf.log(self.sync_net.predict([tf.expand_dims(tf.squeeze(input_audio, axis=0), axis=0),tf.expand_dims(blw_mouth[:5, :, :, :], axis=0)], steps=1))
             return loss
         
         self.__speech2vid_net.compile(loss=loss_function(input_audio),
