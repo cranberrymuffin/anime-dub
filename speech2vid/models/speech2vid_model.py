@@ -78,7 +78,7 @@ class Speech2Vid:
                 return - log(self.sync_net.predict([tf.expand_dims(tf.squeeze(input_audio, axis=0), axis=0),tf.expand_dims(blw_mouth[:5, :, :, :], axis=0)], steps=1))
             return loss
         
-        self.__speech2vid_net.compile(loss = 'mean_absolute_error', z#loss=loss_function(input_audio),
+        self.__speech2vid_net.compile(loss = 'mean_absolute_error', #loss=loss_function(input_audio),
                                       optimizer=tf.keras.optimizers.Adam(learning_rate=learning_rate),
                                       metrics=['accuracy'])
     
