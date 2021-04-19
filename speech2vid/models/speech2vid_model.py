@@ -63,13 +63,13 @@ class Speech2Vid:
 
             self.__speech2vid_net = tf.keras.models.Model(inputs=[input_audio, input_identity], outputs=[decoded])
 
-        self.__speech2vid_net.compile(loss='mean_absolute_error',
+        self.__speech2vid_net.compile(loss=self.loss_function(input_audio),
                                       optimizer=tf.keras.optimizers.Adam(learning_rate=learning_rate),
                                       metrics=['accuracy'])
 
-    def loss_function(self, train_input):
+    def loss_function(self, input_audio):
         def loss(y_true, y_pred):
-            return - log(self.sync_net.predict([train_input[0], y_pred]))
+            return - log(self.sync_net.predict([input_audio, y_pred.numpy()]))
         return loss
 
     @staticmethod
