@@ -63,9 +63,10 @@ class Speech2Vid:
 
             self.__speech2vid_net = tf.keras.models.Model(inputs=[input_audio, input_identity], outputs=[decoded])
         
-        def loss(y_true, y_pred):
+        def loss(audio_inputs, visual_inputs):
             print("INSIDE LOSS")
-            faces = tf.stack(tf.split(y_pred, num_or_size_splits=5, axis=3), axis=1)
+            """
+            faces = tf.stack(tf.split(visual_input, num_or_size_splits=5, axis=3), axis=1)
             blw_faces = tf.image.rgb_to_grayscale(faces)
             blw_mouths = blw_faces[:, :, 112//2:,:, :]
             resized_mouths = []
@@ -74,7 +75,8 @@ class Speech2Vid:
             visual_inputs = tf.stack(resized_mouths)
             print(visual_inputs.numpy())
             print(audio_inputs.get_shape())
-            prediction = self.sync_net.sync_net.predict([audio_inputs, visual_inputs], steps=1)
+            """
+            prediction = self.sync_net.sync_net([audio_inputs, visual_inputs], steps=1)
             print(prediction)
             return prediction
         
