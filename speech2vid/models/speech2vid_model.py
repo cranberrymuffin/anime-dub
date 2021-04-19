@@ -69,7 +69,10 @@ class Speech2Vid:
 
     def loss_function(self, input_audio):
         def loss(y_true, y_pred):
-            return - log(self.sync_net.predict([input_audio, y_pred.numpy()]))
+            print("INSIDE LOSS")
+            print(input_audio.size())
+            print(y_pred.size())
+            return - log(self.sync_net.predict([input_audio, y_pred]))
         return loss
 
     @staticmethod
