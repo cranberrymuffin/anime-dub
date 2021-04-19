@@ -10,10 +10,10 @@ from .hyperparameters import learning_rate, batch_size, epochs
 # https://medium.com/predict/face-recognition-from-scratch-using-siamese-networks-and-tensorflow-df03e32f8cd0
 
 class SyncNet(object):
-    def __init__(self, checkpoint_path=None, is_trainable=True):
+    def __init__(self, checkpoint_path=None):
         if checkpoint_path is not None:
             print("Setting model from saved checkpoint at " + checkpoint_path)
-            self.sync_net = tf.keras.models.load_model(checkpoint_path)
+            self.__sync_net = tf.keras.models.load_model(checkpoint_path)
         else:
             self.audio_architecture = [
                 Conv2D(64, kernel_size=(3, 3), strides=(1, 1)),
@@ -99,11 +99,8 @@ class SyncNet(object):
             ]
 
             visual_model = tf.keras.Sequential(self.visual_architecture)
-            if(is_trainable is False):
-                visual_model.trainable = False
             audio_model = tf.keras.Sequential(self.audio_architecture)
-            if(is_trainable is False):
-                visual_model.trainable = False
+
             visual_input = tf.keras.Input((5, 224, 224, 1))
             audio_input = tf.keras.Input((13, 20, 1))
 
@@ -115,23 +112,21 @@ class SyncNet(object):
 
             outputs = Dense(1, activation=tf.keras.activations.sigmoid)(euclidean_distance)
 
-            self.sync_net = tf.keras.models.Model([audio_input, visual_input], outputs)
-            if(is_trainable is False):
-                self.sync_net.trainable = False
-        self.sync_net.compile(loss=tf.keras.losses.binary_crossentropy,
-                              optimizer=tf.keras.optimizers.Adam(learning_rate=learning_rate),
-                              metrics=['accuracy'])
+            self.__sync_net = tf.keras.models.Model([audio_input, visual_input], outputs)
+        self.__sync_net.compile(loss=tf.keras.losses.binary_crossentropy,
+                                optimizer=tf.keras.optimizers.Adam(learning_rate=learning_rate),
+                                metrics=['accuracy'])
 
     def train(self, visual_inputs, audio_inputs, labels):
         print(audio_inputs.shape)
         print(visual_inputs.shape)
         inputs = [audio_inputs, visual_inputs]
         initial_time = time.time()
-        self.sync_net.summary()
-        self.sync_net.fit(inputs, labels,
-                          batch_size=batch_size,
-                          epochs=epochs
-                          )
+        self.__sync_net.summary()
+        self.__sync_net.fit(inputs, labels,
+                            batch_size=batch_size,
+                            epochs=epochs
+                            )
         final_time = time.time()
         eta = (final_time - initial_time)
         time_unit = 'seconds'
@@ -141,20 +136,16 @@ class SyncNet(object):
         print('Elapsed time acquired for {} epoch(s) -> {} {}'.format(epochs, eta, time_unit))
 
     def evaluate(self, video_inputs, audio_inputs, labels):
-        self.sync_net.evaluate([audio_inputs, video_inputs], labels, batch_size=batch_size)
+        self.__sync_net.evaluate([audio_inputs, video_inputs], labels, batch_size=batch_size)
 
     def summary(self):
-        self.sync_net.summary()
+        self.__sync_net.summary()
 
     def save_model(self, file_path):
-        self.sync_net.save(file_path)
+        self.__sync_net.save(file_path)
 
     def load_model(self, file_path):
-        self.sync_net.load_model(file_path)
+        self.__sync_net.load_model(file_path)
 
     def predict(self, input, steps):
-        return self.sync_net.predict(input, steps=steps)
-
-    def make_untrainable(self):
-        for l in self.sync_net.layers:
-            l.trainable = False
+        return self.__sync_net.predict(input, steps=steps)
