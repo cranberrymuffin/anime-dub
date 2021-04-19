@@ -6,7 +6,6 @@ from .hyperparameters import learning_rate, batch_size, epochs
 from numpy import log
 from syncnet.models.sync_net_model import SyncNet
 
-
 # tensorflow model lifted from https://github.com/Sindhu-Hegde/you_said_that/blob/master/train.py
 class Speech2Vid:
     def __init__(self, checkpoint_path=None, sync_net_path=None):
@@ -63,18 +62,26 @@ class Speech2Vid:
 
             self.__speech2vid_net = tf.keras.models.Model(inputs=[input_audio, input_identity], outputs=[decoded])
 
-        self.__speech2vid_net.compile(loss='mean_absolute_error',
+        def loss_function(input_audio):
+            def loss(y_true, y_pred):
+                print("INSIDE LOSS")
+                # print(input_audio.numpy())
+                # print(y_pred.numpy())
+                print(tf.squeeze(input_audio, axis=0).get_shape())
+                blw_faces = tf.image.rgb_to_grayscale(y_pred)
+                print(blw_faces.get_shape())
+                mouth = tf.image.crop_to_bounding_box(blw_faces, 56, 0, 56, 112)
+                print(mouth.get_shape())
+                blw_mouth = tf.image.resize(blw_faces, [224, 224])
+                print(blw_mouth.get_shape())
+                blw_mouth = tf.expand_dims(tf.squeeze(blw_mouth, axis=0), axis=0)
+                return - log(self.sync_net.predict([tf.expand_dims(tf.squeeze(input_audio, axis=0), axis=0),tf.expand_dims(blw_mouth[:5, :, :, :], axis=0)], steps=1))
+            return loss
+        
+        self.__speech2vid_net.compile(loss=loss_function(input_audio),
                                       optimizer=tf.keras.optimizers.Adam(learning_rate=learning_rate),
                                       metrics=['accuracy'])
-
-    def loss_function(self, input_audio):
-        def loss(y_true, y_pred):
-            print("INSIDE LOSS")
-            print(input_audio.size())
-            print(y_pred.size())
-            return - log(self.sync_net.predict([input_audio, y_pred]))
-        return loss
-
+    
     @staticmethod
     def convolution(x, filters, kernel_size=3, strides=1, padding='same'):
         x = Conv2D(filters=filters, kernel_size=kernel_size, strides=strides, padding=padding)(x)

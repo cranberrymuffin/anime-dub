@@ -147,5 +147,5 @@ class SyncNet(object):
     def load_model(self, file_path):
         self.__sync_net.load_model(file_path)
 
-    def predict(self, input):
-        return self.__sync_net.predict(input)
+    def predict(self, input, steps):
+        return self.__sync_net.predict(input, steps=steps)
