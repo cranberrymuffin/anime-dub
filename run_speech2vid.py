@@ -66,7 +66,7 @@ def augment_data(visual_inputs, audio_inputs):
         labels.append(np.concatenate(resized_set_of_5_frames, axis=2))
         assert (augmented_visual_inputs[input_idx].shape == (112, 112, 15))
         assert (labels[input_idx].shape == (112, 112, 15))
-    return np.array(augmented_visual_inputs), audio_inputs, np.array(labels)
+    return np.array(augmented_visual_inputs), audio_inputs, audio_inputs
 
 
 if __name__ == "__main__":
