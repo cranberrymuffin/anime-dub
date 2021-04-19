@@ -56,10 +56,15 @@ def augment_data(visual_inputs, audio_inputs):
     labels = []
 
     for input_idx, set_of_5_frames in enumerate(visual_inputs):
-        augmented_visual_inputs.append(cv2.resize(random.choice(set_of_5_frames), (112, 112)))
-        labels.append(cv2.resize(set_of_5_frames[2], (112, 112)))
-        assert (augmented_visual_inputs[input_idx].shape == (112, 112, 3))
-        assert (labels[input_idx].shape == (112, 112, 3))
+        for idx, frame in enumerate(set_of_5_frames):
+            set_of_5_frames[idx] = cv2.resize(random.choice(set_of_5_frames), (112, 112))
+
+        shuffled_frames = np.copy(set_of_5_frames)
+        np.random.shuffle(shuffled_frames)
+        augmented_visual_inputs.append(np.stack(shuffled_frames, axis=2))
+        labels.append(np.stack(set_of_5_frames, axis=2))
+        assert (augmented_visual_inputs[input_idx].shape == (112, 112, 15))
+        assert (labels[input_idx].shape == (112, 112, 15))
     return np.array(augmented_visual_inputs), audio_inputs, np.array(labels)
 
 
