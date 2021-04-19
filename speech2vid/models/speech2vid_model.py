@@ -75,7 +75,7 @@ class Speech2Vid:
                 blw_mouth = tf.image.resize(blw_faces, [224, 224])
                 print(blw_mouth.get_shape())
                 blw_mouth = blw_mouth
-                prediction = self.sync_net.predict([tf.expand_dims(tf.squeeze(input_audio, axis=0), axis=0),tf.expand_dims(blw_mouth[:5, :, :, :], axis=0)], steps=1)
+                prediction = self.sync_net.__sync_net.predict([tf.expand_dims(tf.squeeze(input_audio, axis=0), axis=0),tf.expand_dims(blw_mouth[:5, :, :, :], axis=0)], steps=1)
                 print(prediction)
                 return -tf.log(self.sync_net.predict([tf.expand_dims(tf.squeeze(input_audio, axis=0), axis=0),tf.expand_dims(blw_mouth[:5, :, :, :], axis=0)], steps=1))
             return loss
