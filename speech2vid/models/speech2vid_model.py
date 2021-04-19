@@ -18,7 +18,7 @@ class Speech2Vid:
         else:
 
             # Audio encoder
-            input_audio = Input(shape=(13, 20, 1), batch_size=batch_size,)
+            input_audio = Input(shape=(13, 20, 1))
 
             x = self.convolution(input_audio, 64, 3)
             x = self.convolution(x, 128, 3)
@@ -32,7 +32,7 @@ class Speech2Vid:
             encoded_audio = Dense(256, activation='relu')(x)
 
             # Identity encoder
-            input_identity = Input(shape=(112, 112, 15), batch_size=batch_size,)
+            input_identity = Input(shape=(112, 112, 15))
 
             x = self.convolution(input_identity, 96, 7, 2)
             x_skip1 = MaxPooling2D((3, 3), strides=2, padding='same')(x)
@@ -64,25 +64,27 @@ class Speech2Vid:
             self.__speech2vid_net = tf.keras.models.Model(inputs=[input_audio, input_identity], outputs=[decoded])
         
         def loss(audio_inputs, visual_inputs):
-            print("INSIDE LOSS")
+            # converts 112 x 112 x 15 -> 5 x 112 x 112
             faces = tf.stack(tf.split(visual_inputs, num_or_size_splits=5, axis=3), axis=1)
+            # converts images to black and white
             blw_faces = tf.image.rgb_to_grayscale(faces)
+            # crops to mouth (lower half of face frame)
             blw_mouths = blw_faces[:, :, 112//2:,:, :]
+
+            #resizes all the mouths to 224 x 224 and stores them in an array
             resized_mouths = []
             for i, mouth in enumerate(blw_mouths):
                 resized_mouths.append(tf.image.resize(mouth, [224, 224]))
+            # converts array of blw 224 x 224 mouths to a tensor
             visual_inputs = tf.stack(resized_mouths)
-            print(visual_inputs.get_shape())
-            print(audio_inputs.get_shape())
-            N = audio_inputs.get_shape()[0]
-            Pi_sync = self.sync_net.model([audio_inputs, visual_inputs]).numpy()
-            E = (1.0/N) * tf.reduce_sum(-K.log(Pi_sync))
-            print(E)
+            # gets probability of the generated visuals being in sync
+            Pi_sync = self.sync_net.model([audio_inputs, visual_inputs])
+            # computes loss (implementation of bce)
+            E = tf.reduce_mean(tf.reduce_sum(-K.log(Pi_sync)))
             return E
         
         self.__speech2vid_net.compile(loss=loss,
                                       optimizer=tf.keras.optimizers.Adam(learning_rate=learning_rate),
-                                      metrics=['accuracy'],
                                       run_eagerly=True)
     
     @staticmethod
