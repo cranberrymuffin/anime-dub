@@ -57,7 +57,7 @@ def augment_data(visual_inputs, audio_inputs):
 
     for input_idx, set_of_5_frames in enumerate(visual_inputs):
         for idx, frame in enumerate(set_of_5_frames):
-            set_of_5_frames[idx] = cv2.resize(random.choice(set_of_5_frames), (112, 112))
+            set_of_5_frames[idx] = cv2.resize(frame, (112, 112))
 
         shuffled_frames = np.copy(set_of_5_frames)
         np.random.shuffle(shuffled_frames)
