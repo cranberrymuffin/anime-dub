@@ -65,10 +65,10 @@ class Speech2Vid:
         def loss_function(input_audio):
             def loss(y_true, y_pred):
                 print("INSIDE LOSS")
-                # print(input_audio.numpy())
-                # print(y_pred.numpy())
                 print(tf.squeeze(input_audio, axis=0).get_shape())
-                blw_faces = tf.image.rgb_to_grayscale(y_pred)
+                faces = tf.split(y_pred, num_or_size_splits=3, axis=1)
+                print(faces.get_shape())
+                blw_faces = tf.image.rgb_to_grayscale(faces)
                 print(blw_faces.get_shape())
                 mouth = tf.image.crop_to_bounding_box(blw_faces, 56, 0, 56, 112)
                 print(mouth.get_shape())
@@ -78,7 +78,7 @@ class Speech2Vid:
                 return - log(self.sync_net.predict([tf.expand_dims(tf.squeeze(input_audio, axis=0), axis=0),tf.expand_dims(blw_mouth[:5, :, :, :], axis=0)], steps=1))
             return loss
         
-        self.__speech2vid_net.compile(loss = 'mean_absolute_error', #loss=loss_function(input_audio),
+        self.__speech2vid_net.compile(loss=loss_function(input_audio),
                                       optimizer=tf.keras.optimizers.Adam(learning_rate=learning_rate),
                                       metrics=['accuracy'])
     
