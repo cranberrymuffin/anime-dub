@@ -5,6 +5,7 @@ from tensorflow.keras.layers import Input, Dense, Conv2D, MaxPooling2D, Flatten,
 from .hyperparameters import learning_rate, batch_size, epochs
 from syncnet.models.sync_net_model import SyncNet
 tf.executing_eagerly()
+import numpy as np
 # tensorflow model lifted from https://github.com/Sindhu-Hegde/you_said_that/blob/master/train.py
 class Speech2Vid:
     def __init__(self, checkpoint_path=None, sync_net_path=None):
@@ -77,7 +78,9 @@ class Speech2Vid:
                 blw_mouth = blw_mouth
                 prediction = self.sync_net.sync_net.predict([tf.expand_dims(tf.squeeze(input_audio, axis=0), axis=0),tf.expand_dims(blw_mouth[:5, :, :, :], axis=0)], steps=1)
                 print(prediction)
-                return -tf.log(self.sync_net.predict([tf.expand_dims(tf.squeeze(input_audio, axis=0), axis=0),tf.expand_dims(blw_mouth[:5, :, :, :], axis=0)], steps=1))
+                visual_input = tf.expand_dims(blw_mouth[:5, :, :, :], axis=0)
+                audio_input = tf.expand_dims(tf.squeeze(input_audio, axis=0), axis=0)
+                return -tf.log(self.sync_net.predict([np.array(audio_input),np.array(visual_input)], steps=1))
             return loss
         
         self.__speech2vid_net.compile(loss=tf.numpy_function(loss_function, [input_audio], tf.float32),
