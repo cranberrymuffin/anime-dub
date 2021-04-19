@@ -31,9 +31,9 @@ class Speech2Vid:
             encoded_audio = Dense(256, activation='relu')(x)
 
             # Identity encoder
-            input_identity = Input(shape=(112, 112, 3))
+            input_identity = Input(shape=(112, 112, 15))
 
-            x = self.convolution(input_identity, 96, 7, 15)
+            x = self.convolution(input_identity, 96, 7, 2)
             x_skip1 = MaxPooling2D((3, 3), strides=2, padding='same')(x)
             x_skip2 = self.convolution(x_skip1, 256, 5, 2)
             x_skip3 = MaxPooling2D((3, 3), strides=2, padding='same')(x_skip2)
@@ -78,7 +78,7 @@ class Speech2Vid:
                 return - log(self.sync_net.predict([tf.expand_dims(tf.squeeze(input_audio, axis=0), axis=0),tf.expand_dims(blw_mouth[:5, :, :, :], axis=0)], steps=1))
             return loss
         
-        self.__speech2vid_net.compile(loss = 'mean_absolute_error', #loss=loss_function(input_audio),
+        self.__speech2vid_net.compile(loss = 'mean_absolute_error', z#loss=loss_function(input_audio),
                                       optimizer=tf.keras.optimizers.Adam(learning_rate=learning_rate),
                                       metrics=['accuracy'])
     
