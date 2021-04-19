@@ -62,8 +62,8 @@ def augment_data(visual_inputs, audio_inputs):
 
         shuffled_frames = np.copy(resized_set_of_5_frames)
         np.random.shuffle(shuffled_frames)
-        augmented_visual_inputs.append(np.stack(shuffled_frames, axis=2))
-        labels.append(np.stack(resized_set_of_5_frames, axis=2))
+        augmented_visual_inputs.append(np.concatenate(shuffled_frames, axis=2))
+        labels.append(np.concatenate(resized_set_of_5_frames, axis=2))
         assert (augmented_visual_inputs[input_idx].shape == (112, 112, 15))
         assert (labels[input_idx].shape == (112, 112, 15))
     return np.array(augmented_visual_inputs), audio_inputs, np.array(labels)
