@@ -8,7 +8,7 @@ tf.executing_eagerly()
 # tensorflow model lifted from https://github.com/Sindhu-Hegde/you_said_that/blob/master/train.py
 class Speech2Vid:
     def __init__(self, checkpoint_path=None, sync_net_path=None):
-        self.sync_net = SyncNet(sync_net_path)
+        self.sync_net = SyncNet(sync_net_path, is_trainable=False)
 
         if checkpoint_path is not None:
             print("Setting model from saved checkpoint at " + checkpoint_path)

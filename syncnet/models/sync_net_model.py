@@ -10,7 +10,7 @@ from .hyperparameters import learning_rate, batch_size, epochs
 # https://medium.com/predict/face-recognition-from-scratch-using-siamese-networks-and-tensorflow-df03e32f8cd0
 
 class SyncNet(object):
-    def __init__(self, checkpoint_path=None):
+    def __init__(self, checkpoint_path=None, is_trainable=True):
         if checkpoint_path is not None:
             print("Setting model from saved checkpoint at " + checkpoint_path)
             self.__sync_net = tf.keras.models.load_model(checkpoint_path)
@@ -99,8 +99,11 @@ class SyncNet(object):
             ]
 
             visual_model = tf.keras.Sequential(self.visual_architecture)
+            if(is_trainable is not True):
+                visual_model.trainable = False
             audio_model = tf.keras.Sequential(self.audio_architecture)
-
+            if(is_trainable is not True):
+                visual_model.trainable = False
             visual_input = tf.keras.Input((5, 224, 224, 1))
             audio_input = tf.keras.Input((13, 20, 1))
 
@@ -113,6 +116,8 @@ class SyncNet(object):
             outputs = Dense(1, activation=tf.keras.activations.sigmoid)(euclidean_distance)
 
             self.__sync_net = tf.keras.models.Model([audio_input, visual_input], outputs)
+            if(is_trainable is not True):
+                self.__sync_net.trainable = False
         self.__sync_net.compile(loss=tf.keras.losses.binary_crossentropy,
                                 optimizer=tf.keras.optimizers.Adam(learning_rate=learning_rate),
                                 metrics=['accuracy'])
