@@ -76,7 +76,7 @@ class Speech2Vid:
             print(audio_inputs.get_shape())
             N = audio_inputs.get_shape()[0]
             Pi_sync = self.sync_net.model([audio_inputs, visual_inputs]).numpy()
-            E = (1.0/N) * K.sum(-K.log(Pi_sync))
+            E = (1.0/N) * tf.reduce_sum(-K.log(Pi_sync))
             print(E)
             return E
         
