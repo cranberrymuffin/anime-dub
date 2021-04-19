@@ -18,6 +18,8 @@ parser.add_argument('--mode', type=str, required=True, choices=["train", "test",
 parser.add_argument('--data-dir', type=str, required=False, default=None, help='path to data directory')
 parser.add_argument('--load-from', type=str, required=False, default=None,
                     help='path to checkpoint file to load model from')
+parser.add_argument('--sync_net_path', type=str, required=True, default=None,
+                    help='path to checkpoint file to load syncnet model from')
 parser.add_argument('--load-limit', type=int, required=False, default=30000,
                     help='limit on training data points to load')
 
@@ -62,7 +64,7 @@ def augment_data(visual_inputs, audio_inputs):
 
 
 if __name__ == "__main__":
-    speech2vid_net = Speech2Vid(args.load_from)
+    speech2vid_net = Speech2Vid(args.load_from, args.sync_net_path)
 
     if args.mode == "train" or args.mode == "test":
         visual_inputs, audio_inputs, is_synced_labels = preprocess.DataPipeline(args.data_dir,

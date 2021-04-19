@@ -3,11 +3,15 @@ import tensorflow as tf
 from tensorflow.keras.layers import Input, Dense, Conv2D, MaxPooling2D, Flatten, Conv2DTranspose, concatenate, \
     Reshape, BatchNormalization, Activation
 from .hyperparameters import learning_rate, batch_size, epochs
+from numpy import log
+from syncnet.models.sync_net_model import SyncNet
 
 
 # tensorflow model lifted from https://github.com/Sindhu-Hegde/you_said_that/blob/master/train.py
 class Speech2Vid:
-    def __init__(self, checkpoint_path=None):
+    def __init__(self, checkpoint_path=None, sync_net_path=None):
+        self.sync_net = SyncNet(sync_net_path)
+
         if checkpoint_path is not None:
             print("Setting model from saved checkpoint at " + checkpoint_path)
             self.__speech2vid_net = tf.keras.models.load_model(checkpoint_path)
@@ -59,9 +63,14 @@ class Speech2Vid:
 
             self.__speech2vid_net = tf.keras.models.Model(inputs=[input_audio, input_identity], outputs=[decoded])
 
-        self.__speech2vid_net.compile(loss='mean_absolute_error',
+        self.__speech2vid_net.compile(loss=self.loss_function(x),
                                       optimizer=tf.keras.optimizers.Adam(learning_rate=learning_rate),
                                       metrics=['accuracy'])
+
+    def loss_function(self, train_input):
+        def loss(y_true, y_pred):
+            return - log(self.sync_net.predict([train_input[0], y_pred]))
+        return loss
 
     @staticmethod
     def convolution(x, filters, kernel_size=3, strides=1, padding='same'):

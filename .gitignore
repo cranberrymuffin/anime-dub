@@ -134,4 +134,4 @@ dmypy.json
 *.npy
 *.h5
 
-syncnet/data/converted/*
+data/converted/*
