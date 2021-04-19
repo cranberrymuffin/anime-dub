@@ -76,7 +76,7 @@ class Speech2Vid:
             print(visual_inputs.numpy())
             print(audio_inputs.get_shape())
             """
-            prediction = self.sync_net.sync_net([audio_inputs, visual_inputs], steps=1)
+            prediction = self.sync_net.model([audio_inputs, visual_inputs], steps=1)
             print(prediction)
             return prediction
         
