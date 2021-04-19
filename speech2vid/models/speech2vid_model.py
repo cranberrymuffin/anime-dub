@@ -66,7 +66,7 @@ class Speech2Vid:
             def loss(y_true, y_pred):
                 print("INSIDE LOSS")
                 print(tf.squeeze(input_audio, axis=0).get_shape())
-                faces = tf.split(y_pred, num_or_size_splits=3, axis=1)
+                faces = tf.split(y_pred, num_or_size_splits=3, axis=3)
                 print(faces.get_shape())
                 blw_faces = tf.image.rgb_to_grayscale(faces)
                 print(blw_faces.get_shape())
