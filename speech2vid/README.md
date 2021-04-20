@@ -16,6 +16,6 @@ We have modified the proposed visual encoding architechture to injest 5 frames a
 
 ### Loss Function
 
-Speech2Vid uses an L1 Loss function. We have implemented a custom loss function which takes in the output video and the ground truth audio, feeds these into SyncNet to return the probability the audio/visual pair is synced and implement a BCE loss calculation on this. This implementation follows the equation below (from Wav2Lip)
+Speech2Vid uses an L1 Loss function. We have implemented a custom loss function which takes in the output video and the ground truth audio, feeds these into SyncNet to return the probability the audio/visual pair is synced and implement a BCE loss calculation on this. This implementation follows the equation below (from Wav2Lip).
 
 <img width="334" alt="Screen Shot 2021-04-20 at 6 08 15 PM" src="https://user-images.githubusercontent.com/70986035/115469858-62231500-a203-11eb-927d-37e97413971d.png">
