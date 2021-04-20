@@ -14,7 +14,7 @@ Syncnet's visual model requires an input of 5 frames. These 5 frames represent 0
 
 Converting audio and video to this format can be found in `/preprocess.py`
 
-After processing video and audio into their specified formats of 0.2 second chunks, we keep half the data in order and treat them as "true pairs" and shuffle the matches of the second half to unsync the audio and video and treat these as false pairs. We assign labels of 1 to true pairs and labels of 0 to false pairs.
+After processing video and audio into their specified formats of 0.2 second chunks, we keep half the data in order and treat them as "true pairs" and shuffle the matches of the second half to unsync the audio and video and treat these as "false pairs". We assign labels of 1 to true pairs and labels of 0 to false pairs.
 
 ## Training
 
