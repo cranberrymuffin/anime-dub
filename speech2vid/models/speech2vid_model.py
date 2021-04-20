@@ -1,3 +1,4 @@
+import datetime
 import time
 import tensorflow as tf
 from tensorflow.keras.layers import Input, Dense, Conv2D, MaxPooling2D, Flatten, Conv2DTranspose, concatenate, \
@@ -105,10 +106,15 @@ class Speech2Vid:
         inputs = [audio_inputs, visual_inputs]
         initial_time = time.time()
         self.__speech2vid_net.summary()
+
+        log_dir = "logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+        tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1)
+
         self.__speech2vid_net.fit(inputs, labels,
-                                  batch_size=batch_size,
-                                  epochs=epochs
-                                  )
+                                batch_size=batch_size,
+                                epochs=epochs,
+                                callbacks=[tensorboard_callback]
+                                )
         final_time = time.time()
         eta = (final_time - initial_time)
         time_unit = 'seconds'

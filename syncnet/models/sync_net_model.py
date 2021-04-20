@@ -1,3 +1,5 @@
+import datetime
+
 import tensorflow as tf
 from tensorflow.keras.layers import Conv2D, MaxPool2D, ZeroPadding2D, Conv3D, ReLU, MaxPool3D, Dense, \
     BatchNormalization, Flatten, ZeroPadding3D
@@ -123,9 +125,14 @@ class SyncNet(object):
         inputs = [audio_inputs, visual_inputs]
         initial_time = time.time()
         self.model.summary()
+
+        log_dir = "logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+        tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1)
+
         self.model.fit(inputs, labels,
                        batch_size=batch_size,
-                       epochs=epochs
+                       epochs=epochs,
+                       callbacks=[tensorboard_callback]
                        )
         final_time = time.time()
         eta = (final_time - initial_time)
