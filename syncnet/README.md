@@ -65,6 +65,7 @@ see the file `/run_syncnet.py` in the root of the project
         `python run_syncnet.py --mode train  --load-from <path to saved model (.h5 file)>`
 
 ### Testing
-        `python run_syncnet.py --mode test --load-from <path to saved model (.h5 file)>`
+
+`python run_syncnet.py --mode test --load-from <path to saved model (.h5 file)>`
 
 
