@@ -1,3 +1,4 @@
+import os
 import datetime
 import time
 import tensorflow as tf
@@ -9,6 +10,7 @@ tf.executing_eagerly()
 import numpy as np
 import tensorflow.keras.backend as K
 import math
+import cv2
 
 # tensorflow model lifted from https://github.com/Sindhu-Hegde/you_said_that/blob/master/train.py
 class Speech2Vid:
@@ -135,5 +137,15 @@ class Speech2Vid:
     def load_model(self, file_path):
         self.__speech2vid_net.load_model(file_path)
 
+    @staticmethod
+    def current_milli_time():
+        return round(time.time() * 1000)
+
     def predict(self, input):
-        return self.__speech2vid_net.predict(input)
+        output = self.__speech2vid_net.predict(input)
+        dir_name = str(self.current_milli_time())
+        os.mkdir("output/"+dir_name)
+        faces = tf.stack(tf.split(output, num_or_size_splits=5, axis=3), axis=1)
+        for face in faces:
+            cv2.imwrite("output/" + dir_name + "/" + self.current_milli_time() + "_out.png", face.numpy())
+        return output
