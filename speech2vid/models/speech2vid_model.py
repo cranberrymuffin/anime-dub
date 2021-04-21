@@ -15,6 +15,27 @@ import cv2
 # tensorflow model lifted from https://github.com/Sindhu-Hegde/you_said_that/blob/master/train.py
 class Speech2Vid:
     def __init__(self, checkpoint_path=None, sync_net_path=None):
+        def loss(audio_inputs, visual_inputs):
+            # converts 112 x 112 x 15 -> 5 x 112 x 112
+            faces = tf.stack(tf.split(visual_inputs, num_or_size_splits=5, axis=3), axis=1)
+            # converts images to black and white
+            blw_faces = tf.image.rgb_to_grayscale(faces)
+            # crops to mouth (lower half of face frame)
+            blw_mouths = blw_faces[:, :, 112 // 2:, :, :]
+
+            # resizes all the mouths to 224 x 224 and stores them in an array
+            resized_mouths = []
+            for i, mouth in enumerate(blw_mouths):
+                resized_mouths.append(tf.image.resize(mouth, [224, 224]))
+            # converts array of blw 224 x 224 mouths to a tensor
+            visual_inputs = tf.stack(resized_mouths)
+            # gets probability of the generated visuals being in sync
+            Pi_sync = self.sync_net.model([audio_inputs, visual_inputs])
+            # computes loss (implementation of bce)
+            E = tf.reduce_mean(tf.reduce_sum(-K.log(Pi_sync)))
+            return E
+
+
         self.sync_net = SyncNet(sync_net_path)
         if checkpoint_path is not None:
             self.__speech2vid_net = tf.keras.models.load_model(checkpoint_path)
@@ -67,26 +88,7 @@ class Speech2Vid:
 
             self.__speech2vid_net = tf.keras.models.Model(inputs=[input_audio, input_identity], outputs=[decoded])
         
-        def loss(audio_inputs, visual_inputs):
-            # converts 112 x 112 x 15 -> 5 x 112 x 112
-            faces = tf.stack(tf.split(visual_inputs, num_or_size_splits=5, axis=3), axis=1)
-            # converts images to black and white
-            blw_faces = tf.image.rgb_to_grayscale(faces)
-            # crops to mouth (lower half of face frame)
-            blw_mouths = blw_faces[:, :, 112//2:,:, :]
 
-            #resizes all the mouths to 224 x 224 and stores them in an array
-            resized_mouths = []
-            for i, mouth in enumerate(blw_mouths):
-                resized_mouths.append(tf.image.resize(mouth, [224, 224]))
-            # converts array of blw 224 x 224 mouths to a tensor
-            visual_inputs = tf.stack(resized_mouths)
-            # gets probability of the generated visuals being in sync
-            Pi_sync = self.sync_net.model([audio_inputs, visual_inputs])
-            # computes loss (implementation of bce)
-            E = tf.reduce_mean(tf.reduce_sum(-K.log(Pi_sync)))
-            return E
-        
         self.__speech2vid_net.compile(loss=loss,
                                       optimizer=tf.keras.optimizers.Adam(learning_rate=learning_rate),
                                       run_eagerly=True)
