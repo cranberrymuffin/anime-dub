@@ -149,6 +149,6 @@ class Speech2Vid:
         os.system("mkdir output/"+dir_name)
         faces = tf.split(output, num_or_size_splits=5, axis=3)
         for idx, face in enumerate(faces):
-             cv2.imwrite("output/" + dir_name + "/" + str(idx) + "_out.jpg", face.numpy()[0])
+             cv2.imwrite("output/" + dir_name + "/" + str(idx) + "_out.jpg", face.numpy()[0]*255)
              print(face.numpy()[0].shape)
         return output
