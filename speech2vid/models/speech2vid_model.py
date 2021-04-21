@@ -149,5 +149,5 @@ class Speech2Vid:
         os.mkdir("output/"+dir_name)
         faces = tf.stack(tf.split(output, num_or_size_splits=5, axis=3), axis=1)
         for face in faces:
-            cv2.imwrite("output/" + dir_name + "/" + str(self.current_milli_time()) + "_out.png", face.numpy())
+            cv2.imwrite("output/" + dir_name + "/" + str(self.current_milli_time()) + "_out.jpg", face.numpy())
         return output
