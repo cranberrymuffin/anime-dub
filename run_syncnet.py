@@ -66,6 +66,11 @@ if __name__ == "__main__":
     if args.mode == "train" or args.mode == "test":
         visual_inputs, audio_inputs, is_synced_labels = preprocess.DataPipeline(args.data_dir,
                                                                                 args.load_limit).get_data()
+
+        visual_inputs = visual_inputs[0:5000]
+        audio_inputs = audio_inputs[0:5000]
+        is_synced_labels = is_synced_labels[0:5000]
+
         visual_inputs, audio_inputs = augment_data(visual_inputs, audio_inputs)
         split_data = split_data(visual_inputs, audio_inputs, is_synced_labels)
         (train_visual_inputs, train_audio_inputs, train_labels) = split_data[0]
