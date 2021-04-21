@@ -112,12 +112,12 @@ class Speech2Vid:
         self.__speech2vid_net.summary()
 
         log_dir = "logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
-        tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1)
+        # tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1)
 
         self.__speech2vid_net.fit(inputs, labels,
                                 batch_size=batch_size,
                                 epochs=epochs,
-                                callbacks=[tensorboard_callback]
+                                # callbacks=[tensorboard_callback]
                                 )
         final_time = time.time()
         eta = (final_time - initial_time)
