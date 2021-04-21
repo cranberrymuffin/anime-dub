@@ -144,11 +144,15 @@ class Speech2Vid:
         return round(time.time() * 1000)
 
     def predict(self, input):
+        visual_input = input[1]
+        print(visual_input.shape)
+        split_visual_input = np.split(visual_input[0], 5, axis=2)
         output = self.__speech2vid_net.predict(input)
         dir_name = str(self.current_milli_time())
         os.system("mkdir output/"+dir_name)
         faces = tf.split(output, num_or_size_splits=5, axis=3)
-        for idx, face in enumerate(faces):
+        for idx, (face, in_face) in enumerate(zip(faces, split_visual_input)):
+             cv2.imwrite("output/" + dir_name + "/" + str(idx) + "_in.jpg", in_face * 255)
              cv2.imwrite("output/" + dir_name + "/" + str(idx) + "_out.jpg", face.numpy()[0]*255)
              print(face.numpy()[0].shape)
         return output
