@@ -37,7 +37,7 @@ class Speech2Vid:
 
         self.sync_net = SyncNet(sync_net_path)
         if checkpoint_path is not None:
-            self.__speech2vid_net = tf.keras.models.load_model(checkpoint_path, custom_objects={ 'loss': loss })
+            self.__speech2vid_net = tf.python.keras.models.load_model(checkpoint_path, custom_objects={ 'loss': loss })
             print("Setting model from saved checkpoint at " + checkpoint_path)
         else:
 
