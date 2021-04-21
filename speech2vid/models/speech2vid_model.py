@@ -148,8 +148,9 @@ class Speech2Vid:
         print(input[1].shape)
         output = self.__speech2vid_net.predict(input)
         dir_name = str(self.current_milli_time())
-        os.mkdir("output/"+dir_name)
-        faces = tf.stack(tf.split(output, num_or_size_splits=5, axis=3), axis=1)
-        for face in faces:
-            cv2.imwrite("output/" + dir_name + "/" + self.current_milli_time() + "_out.png", face.numpy())
+        os.system("mkdir output/"+dir_name)
+        faces = tf.split(output, num_or_size_splits=5, axis=3)
+        for idx, face in enumerate(faces):
+             cv2.imwrite("output/" + dir_name + "/" + str(idx) + "_out.jpg", face.numpy()[0])
+             print(face.numpy()[0].shape)
         return output
