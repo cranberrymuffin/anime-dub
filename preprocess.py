@@ -123,7 +123,7 @@ class DataPipeline:
         success, frame = video.read()
         frames = []
         while success:
-            frames.append(frame)
+            frames.append(cv2.resize(frame, (100,100)))
             success, frame = video.read()
         frames = np.array(frames)
 

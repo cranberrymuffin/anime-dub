@@ -112,7 +112,7 @@ class SyncNet(object):
             euclidean_distance = tf.keras.layers.Lambda(lambda tensors: K.l2_normalize(tensors[0] - tensors[1], axis=1))(
                 [visual_output, audio_output])
 
-            outputs = Dense(1, activation=tf.keras.activations.sigmoid)(euclidean_distance)
+            outputs = Dense(1, activation=tf.keras.activations.sigmoid)(0.00000001 + euclidean_distance)
 
             self.model = tf.keras.models.Model([audio_input, visual_input], outputs)
         self.model.compile(loss=tf.keras.losses.binary_crossentropy,
@@ -126,13 +126,13 @@ class SyncNet(object):
         initial_time = time.time()
         self.model.summary()
 
-        log_dir = "logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
-        tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1)
+        #log_dir = "logs/fit/human/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+        #tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1)
 
         self.model.fit(inputs, labels,
                        batch_size=batch_size,
                        epochs=epochs,
-                       callbacks=[tensorboard_callback]
+         #              callbacks=[tensorboard_callback]
                        )
         final_time = time.time()
         eta = (final_time - initial_time)
