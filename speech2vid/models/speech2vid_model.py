@@ -21,9 +21,9 @@ class Speech2Vid:
             # converts images to black and white
             blw_faces = tf.image.rgb_to_grayscale(faces)
             # crops to mouth (lower half of face frame)
-            blw_mouths = blw_faces[:, :, 112 // 2:, :, :]
+            blw_mouths = blw_faces[:, :, 112//2:,:, :]
 
-            # resizes all the mouths to 224 x 224 and stores them in an array
+            #resizes all the mouths to 224 x 224 and stores them in an array
             resized_mouths = []
             for i, mouth in enumerate(blw_mouths):
                 resized_mouths.append(tf.image.resize(mouth, [224, 224]))
@@ -35,10 +35,10 @@ class Speech2Vid:
             E = tf.reduce_mean(tf.reduce_sum(-K.log(Pi_sync)))
             return E
 
-
         self.sync_net = SyncNet(sync_net_path)
         if checkpoint_path is not None:
-            self.__speech2vid_net.load_weights(checkpoint_path)
+            self.__speech2vid_net = tf.keras.models.load_model(checkpoint_path, custom_objects={ 'loss': loss })
+            print("Setting model from saved checkpoint at " + checkpoint_path)
         else:
 
             # Audio encoder
@@ -86,7 +86,6 @@ class Speech2Vid:
             decoded = Conv2DTranspose(15, (5, 5), strides=2, activation='sigmoid', padding='same')(x)
 
             self.__speech2vid_net = tf.keras.models.Model(inputs=[input_audio, input_identity], outputs=[decoded])
-        
 
         self.__speech2vid_net.compile(loss=loss,
                                       optimizer=tf.keras.optimizers.Adam(learning_rate=learning_rate),
