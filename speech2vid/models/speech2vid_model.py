@@ -144,8 +144,6 @@ class Speech2Vid:
         return round(time.time() * 1000)
 
     def predict(self, input):
-        print(input[0].shape)
-        print(input[1].shape)
         output = self.__speech2vid_net.predict(input)
         dir_name = str(self.current_milli_time())
         os.system("mkdir output/"+dir_name)
