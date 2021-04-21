@@ -38,8 +38,7 @@ class Speech2Vid:
 
         self.sync_net = SyncNet(sync_net_path)
         if checkpoint_path is not None:
-            self.__speech2vid_net = tf.keras.models.load_model(checkpoint_path)
-            print("Setting model from saved checkpoint at " + checkpoint_path)
+            self.__speech2vid_net.load_weights(checkpoint_path)
         else:
 
             # Audio encoder
