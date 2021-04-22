@@ -68,4 +68,7 @@ see the file `/run_syncnet.py` in the root of the project
 
 `python run_syncnet.py --mode test --load-from <path to saved model (.h5 file)>`
 
+### Model Summary
+![syncnet](https://user-images.githubusercontent.com/25395806/115795635-4607ab00-a39e-11eb-9074-534aa22bd8ae.png)
+
 
